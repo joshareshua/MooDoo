@@ -27,7 +27,7 @@ The application is built with a modular, object-oriented design:
 | Storage | Save/load tasks and journal entries | `class Storage` |
 | UI | Handle input/output (CLI) | `class App` |
 
-## 📁 Project Structure
+## Project Structure
 ```
 MooDoo/
 ├── src/
@@ -72,7 +72,7 @@ make format
 make check
 ```
 
-## 🛠️ Development Roadmap
+##  Development Roadmap
 
 ### Phase 1: Core Implementation 
 - [x] Project structure setup
