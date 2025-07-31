@@ -16,7 +16,7 @@ MooDoo is a planner and journal application designed specifically for people wit
 - Persist user data (local file storage)
 - Clean CLI interface
 
-## 🏗️ System Architecture
+##  System Architecture
 The application is built with a modular, object-oriented design:
 
 | Component | Responsibility | C++ Class |

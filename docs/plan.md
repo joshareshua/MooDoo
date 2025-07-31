@@ -1,15 +1,15 @@
 # MooDoo Development Plan
 
-## 🎯 Project Vision
+## Project Vision
 MooDoo is a mental health-aware planner that adapts to the user's emotional state, providing personalized support for people with ADHD and mental health considerations.
 
-## 🧠 Core Concept
+## Core Concept
 - **Mood-Aware Planning**: Adjust task suggestions based on current emotional state
 - **Supportive Environment**: Provide encouragement and understanding when productivity is low
 - **Motivation Leverage**: Harness positive moods for enhanced productivity
 - **Non-Judgmental**: Never shame users for low productivity days
 
-## 🏗️ System Design
+## System Design
 
 ### Component Responsibilities
 
@@ -45,7 +45,7 @@ MooDoo is a mental health-aware planner that adapts to the user's emotional stat
   - Backup and restore functionality
   - Data validation and integrity checks
 
-## 📋 Implementation Phases
+## Implementation Phases
 
 ### Phase 1: Foundation (Current)
 1. **Project Setup** ✅
@@ -102,7 +102,7 @@ MooDoo is a mental health-aware planner that adapts to the user's emotional stat
    - Habit formation
    - Export capabilities
 
-## 🎨 User Experience Flow
+## User Experience Flow
 
 ### Daily Interaction
 1. **Morning Check-in**
@@ -125,7 +125,7 @@ MooDoo is a mental health-aware planner that adapts to the user's emotional stat
    - Log final mood
    - Receive supportive summary
 
-## 🔧 Technical Considerations
+## Technical Considerations
 
 ### Data Structures
 ```cpp
@@ -159,13 +159,13 @@ struct MoodEntry {
 - Data corruption
 - Graceful degradation
 
-## 🚀 Success Metrics
+## Success Metrics
 - User engagement (daily usage)
 - Task completion rates
 - Mood improvement over time
 - User feedback and satisfaction
 
-## 🔮 Future Enhancements
+## Future Enhancements
 - Mobile app version
 - Cloud synchronization
 - Social features (anonymous support groups)
