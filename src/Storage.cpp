@@ -194,9 +194,40 @@ int Storage::getNextMoodId() {
 }
 
 // Placeholder implementations for future features
-bool Storage::updateTask(const Task& task) {
-    // TODO: Implement task updating
-    return false;
+bool Storage::updateTask(const Task& updatedTask) {
+    // Load all tasks
+    std::vector<Task> tasks;
+    if (!loadTasks(tasks)) {
+        return false;
+    }
+    
+    // Find and update the specific task
+    for (auto& task : tasks) {
+        if (task.id == updatedTask.id) {
+            task = updatedTask;
+            break;
+        }
+    }
+    
+    // Rewrite the entire file with updated data
+    std::ofstream file(tasksFile, std::ios::trunc); // Truncate file
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open tasks file for updating" << std::endl;
+        return false;
+    }
+    
+    for (const auto& task : tasks) {
+        file << task.id << "|"
+             << task.title << "|"
+             << task.description << "|"
+             << priorityToString(task.priority) << "|"
+             << (task.completed ? "1" : "0") << "|"
+             << timeToString(task.created) << "|"
+             << timeToString(task.completed_time) << std::endl;
+    }
+    
+    file.close();
+    return true;
 }
 
 bool Storage::deleteTask(int taskId) {

@@ -14,9 +14,10 @@ void showMenu() {
     cout << "1. Add a new task" << endl;
     cout << "2. Add a mood entry" << endl;
     cout << "3. View all tasks" << endl;
-    cout << "4. View mood history" << endl;
-    cout << "5. Exit" << endl;
-    cout << "Choose an option (1-5): ";
+    cout << "4. Mark task complete/incomplete" << endl;
+    cout << "5. View mood history" << endl;
+    cout << "6. Exit" << endl;
+    cout << "Choose an option (1-6): ";
 }
 
 void addTask(Storage& storage) {
@@ -87,6 +88,65 @@ void addMoodEntry(Storage& storage) {
     }
 }
 
+void markTaskComplete(Storage& storage) {
+    clearScreen();
+    cout << "=== Mark Task Complete/Incomplete ===" << endl;
+    
+    // First, show all tasks
+    vector<Task> tasks;
+    if (!storage.loadTasks(tasks)) {
+        cout << "Error loading tasks" << endl;
+        return;
+    }
+    
+    if (tasks.empty()) {
+        cout << "No tasks found. Add some tasks first!" << endl;
+        return;
+    }
+    
+    // Display tasks with numbers
+    for (size_t i = 0; i < tasks.size(); i++) {
+        string status = tasks[i].completed ? "✓ Done" : "○ Pending";
+        string priorityStr;
+        switch(tasks[i].priority) {
+            case Priority::LOW: priorityStr = "Low"; break;
+            case Priority::HIGH: priorityStr = "High"; break;
+            default: priorityStr = "Medium"; break;
+        }
+        
+        cout << "[" << (i + 1) << "] " << status << " | " << priorityStr << " | " << tasks[i].title << endl;
+    }
+    
+    cout << "\nEnter task number to toggle (1-" << tasks.size() << "): ";
+    int taskChoice;
+    cin >> taskChoice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (taskChoice < 1 || taskChoice > static_cast<int>(tasks.size())) {
+        cout << "Invalid task number!" << endl;
+        return;
+    }
+    
+    // Toggle completion status
+    Task& selectedTask = tasks[taskChoice - 1];
+    selectedTask.completed = !selectedTask.completed;
+    
+    if (selectedTask.completed) {
+        selectedTask.completed_time = time(nullptr);
+        cout << "✓ Marked '" << selectedTask.title << "' as complete!" << endl;
+    } else {
+        selectedTask.completed_time = 0;
+        cout << "○ Marked '" << selectedTask.title << "' as incomplete" << endl;
+    }
+    
+    // Save the updated task
+    if (storage.updateTask(selectedTask)) {
+        cout << "✓ Task status saved!" << endl;
+    } else {
+        cout << "✗ Error saving task status" << endl;
+    }
+}
+
 void viewTasks(Storage& storage) {
     clearScreen();
     cout << "=== Your Tasks ===" << endl;
@@ -96,6 +156,7 @@ void viewTasks(Storage& storage) {
         if (tasks.empty()) {
             cout << "No tasks found. Add some tasks to get started!" << endl;
         } else {
+            int completedCount = 0;
             for (const auto& task : tasks) {
                 string priorityStr;
                 switch(task.priority) {
@@ -105,9 +166,14 @@ void viewTasks(Storage& storage) {
                 }
                 
                 string status = task.completed ? "✓ Done" : "○ Pending";
+                if (task.completed) completedCount++;
+                
                 cout << "[" << task.id << "] " << status << " | " << priorityStr << " | " << task.title << endl;
                 cout << "    " << task.description << endl << endl;
             }
+            
+            // Show completion summary
+            cout << "--- Progress: " << completedCount << "/" << tasks.size() << " tasks completed ---" << endl;
         }
     } else {
         cout << "Error loading tasks" << endl;
@@ -165,9 +231,12 @@ int main() {
                 viewTasks(storage);
                 break;
             case 4:
-                viewMoodHistory(storage);
+                markTaskComplete(storage);
                 break;
             case 5:
+                viewMoodHistory(storage);
+                break;
+            case 6:
                 cout << "Thanks for using MooDoo! Take care of yourself! 💙" << endl;
                 return 0;
             default:
