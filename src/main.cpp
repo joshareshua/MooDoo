@@ -3,6 +3,7 @@
 #include <string>
 #include <limits>
 #include "Storage.h"
+#include "MoodAnalyzer.h"
 using namespace std;
 
 void clearScreen() {
@@ -16,8 +17,9 @@ void showMenu() {
     cout << "3. View all tasks" << endl;
     cout << "4. Mark task complete/incomplete" << endl;
     cout << "5. View mood history" << endl;
-    cout << "6. Exit" << endl;
-    cout << "Choose an option (1-6): ";
+    cout << "6. Get mood insights" << endl;
+    cout << "7. Exit" << endl;
+    cout << "Choose an option (1-7): ";
 }
 
 void addTask(Storage& storage) {
@@ -83,6 +85,21 @@ void addMoodEntry(Storage& storage) {
     
     if (storage.saveMoodEntry(entry)) {
         cout << "✓ Mood entry saved successfully!" << endl;
+        
+        // Generate and show supportive message
+        MoodAnalyzer analyzer;
+        cout << analyzer.generateSupportiveMessage(entry);
+        
+        // Show task suggestion based on mood
+        vector<Task> tasks;
+        storage.loadTasks(tasks);
+        int completedTasks = 0;
+        for (const auto& task : tasks) {
+            if (task.completed) completedTasks++;
+        }
+        
+        cout << analyzer.generateTaskSuggestion(entry.mood, completedTasks, tasks.size()) << endl;
+        
     } else {
         cout << "✗ Error saving mood entry" << endl;
     }
@@ -208,6 +225,43 @@ void viewMoodHistory(Storage& storage) {
     }
 }
 
+void getMoodInsights(Storage& storage) {
+    clearScreen();
+    cout << "=== Mood Insights ===" << endl;
+    
+    vector<MoodEntry> entries;
+    if (storage.loadMoodEntries(entries)) {
+        if (entries.size() < 2) {
+            cout << "Add more mood entries to get insights about your patterns!" << endl;
+        } else {
+            MoodAnalyzer analyzer;
+            cout << analyzer.analyzeMoodTrend(entries) << endl;
+            
+            // Show some basic statistics
+            int totalEntries = entries.size();
+            int lowMoodCount = 0, highMoodCount = 0, neutralCount = 0;
+            
+            for (const auto& entry : entries) {
+                if (entry.mood == MoodLevel::VERY_LOW || entry.mood == MoodLevel::LOW) {
+                    lowMoodCount++;
+                } else if (entry.mood == MoodLevel::GOOD || entry.mood == MoodLevel::EXCELLENT) {
+                    highMoodCount++;
+                } else {
+                    neutralCount++;
+                }
+            }
+            
+            cout << "\n📈 Your Mood Summary:" << endl;
+            cout << "Total entries: " << totalEntries << endl;
+            cout << "Low mood days: " << lowMoodCount << " (" << (lowMoodCount * 100 / totalEntries) << "%)" << endl;
+            cout << "High mood days: " << highMoodCount << " (" << (highMoodCount * 100 / totalEntries) << "%)" << endl;
+            cout << "Neutral days: " << neutralCount << " (" << (neutralCount * 100 / totalEntries) << "%)" << endl;
+        }
+    } else {
+        cout << "Error loading mood entries" << endl;
+    }
+}
+
 int main() {
     Storage storage;
     int choice;
@@ -237,6 +291,9 @@ int main() {
                 viewMoodHistory(storage);
                 break;
             case 6:
+                getMoodInsights(storage);
+                break;
+            case 7:
                 cout << "Thanks for using MooDoo! Take care of yourself! 💙" << endl;
                 return 0;
             default:
