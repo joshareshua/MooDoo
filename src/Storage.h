@@ -83,6 +83,10 @@ public:
     void initializeFiles();
     bool backupData();
     bool restoreData();
+    
+    // Getter methods for file paths
+    std::string getTasksFile() const { return tasksFile; }
+    std::string getJournalFile() const { return journalFile; }
 };
 
 #endif // STORAGE_H

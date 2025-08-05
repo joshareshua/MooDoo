@@ -16,10 +16,12 @@ void showMenu() {
     cout << "2. Add a mood entry" << endl;
     cout << "3. View all tasks" << endl;
     cout << "4. Mark task complete/incomplete" << endl;
-    cout << "5. View mood history" << endl;
-    cout << "6. Get mood insights" << endl;
-    cout << "7. Exit" << endl;
-    cout << "Choose an option (1-7): ";
+    cout << "5. Edit a task" << endl;
+    cout << "6. Delete a task" << endl;
+    cout << "7. View mood history" << endl;
+    cout << "8. Get mood insights" << endl;
+    cout << "9. Exit" << endl;
+    cout << "Choose an option (1-9): ";
 }
 
 void addTask(Storage& storage) {
@@ -197,6 +199,157 @@ void viewTasks(Storage& storage) {
     }
 }
 
+void editTask(Storage& storage) {
+    clearScreen();
+    cout << "=== Edit Task ===" << endl;
+    
+    // First, show all tasks
+    vector<Task> tasks;
+    if (!storage.loadTasks(tasks)) {
+        cout << "Error loading tasks" << endl;
+        return;
+    }
+    
+    if (tasks.empty()) {
+        cout << "No tasks found. Add some tasks first!" << endl;
+        return;
+    }
+    
+    // Display tasks with numbers
+    for (size_t i = 0; i < tasks.size(); i++) {
+        string status = tasks[i].completed ? "✓ Done" : "○ Pending";
+        string priorityStr;
+        switch(tasks[i].priority) {
+            case Priority::LOW: priorityStr = "Low"; break;
+            case Priority::HIGH: priorityStr = "High"; break;
+            default: priorityStr = "Medium"; break;
+        }
+        
+        cout << "[" << (i + 1) << "] " << status << " | " << priorityStr << " | " << tasks[i].title << endl;
+    }
+    
+    cout << "\nEnter task number to edit (1-" << tasks.size() << "): ";
+    int taskChoice;
+    cin >> taskChoice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (taskChoice < 1 || taskChoice > static_cast<int>(tasks.size())) {
+        cout << "Invalid task number!" << endl;
+        return;
+    }
+    
+    Task& selectedTask = tasks[taskChoice - 1];
+    
+    cout << "\nCurrent task: " << selectedTask.title << endl;
+    cout << "Current description: " << selectedTask.description << endl;
+    
+    cout << "\nEnter new title (or press Enter to keep current): ";
+    string newTitle;
+    getline(cin, newTitle);
+    if (!newTitle.empty()) {
+        selectedTask.title = newTitle;
+    }
+    
+    cout << "Enter new description (or press Enter to keep current): ";
+    string newDescription;
+    getline(cin, newDescription);
+    if (!newDescription.empty()) {
+        selectedTask.description = newDescription;
+    }
+    
+    cout << "Change priority? (1=Low, 2=Medium, 3=High, 0=keep current): ";
+    int priorityChoice;
+    cin >> priorityChoice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (priorityChoice > 0) {
+        switch(priorityChoice) {
+            case 1: selectedTask.priority = Priority::LOW; break;
+            case 3: selectedTask.priority = Priority::HIGH; break;
+            case 2: selectedTask.priority = Priority::MEDIUM; break;
+        }
+    }
+    
+    if (storage.updateTask(selectedTask)) {
+        cout << "✓ Task updated successfully!" << endl;
+    } else {
+        cout << "✗ Error updating task" << endl;
+    }
+}
+
+void deleteTask(Storage& storage) {
+    clearScreen();
+    cout << "=== Delete Task ===" << endl;
+    
+    // First, show all tasks
+    vector<Task> tasks;
+    if (!storage.loadTasks(tasks)) {
+        cout << "Error loading tasks" << endl;
+        return;
+    }
+    
+    if (tasks.empty()) {
+        cout << "No tasks found. Add some tasks first!" << endl;
+        return;
+    }
+    
+    // Display tasks with numbers
+    for (size_t i = 0; i < tasks.size(); i++) {
+        string status = tasks[i].completed ? "✓ Done" : "○ Pending";
+        string priorityStr;
+        switch(tasks[i].priority) {
+            case Priority::LOW: priorityStr = "Low"; break;
+            case Priority::HIGH: priorityStr = "High"; break;
+            default: priorityStr = "Medium"; break;
+        }
+        
+        cout << "[" << (i + 1) << "] " << status << " | " << priorityStr << " | " << tasks[i].title << endl;
+    }
+    
+    cout << "\nEnter task number to delete (1-" << tasks.size() << "): ";
+    int taskChoice;
+    cin >> taskChoice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (taskChoice < 1 || taskChoice > static_cast<int>(tasks.size())) {
+        cout << "Invalid task number!" << endl;
+        return;
+    }
+    
+    Task& selectedTask = tasks[taskChoice - 1];
+    
+    cout << "\nAre you sure you want to delete: '" << selectedTask.title << "'? (y/n): ";
+    char confirm;
+    cin >> confirm;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (confirm == 'y' || confirm == 'Y') {
+        // Remove the task from the vector
+        tasks.erase(tasks.begin() + taskChoice - 1);
+        
+        // Rewrite the entire file without the deleted task
+        ofstream file(storage.getTasksFile(), ios::trunc);
+        if (file.is_open()) {
+            for (const auto& task : tasks) {
+                file << task.id << "|"
+                     << task.title << "|"
+                     << task.description << "|"
+                     << (task.priority == Priority::LOW ? "1" : 
+                         task.priority == Priority::HIGH ? "3" : "2") << "|"
+                     << (task.completed ? "1" : "0") << "|"
+                     << task.created << "|"
+                     << task.completed_time << endl;
+            }
+            file.close();
+            cout << "✓ Task deleted successfully!" << endl;
+        } else {
+            cout << "✗ Error deleting task" << endl;
+        }
+    } else {
+        cout << "Task deletion cancelled." << endl;
+    }
+}
+
 void viewMoodHistory(Storage& storage) {
     clearScreen();
     cout << "=== Mood History ===" << endl;
@@ -288,12 +441,18 @@ int main() {
                 markTaskComplete(storage);
                 break;
             case 5:
-                viewMoodHistory(storage);
+                editTask(storage);
                 break;
             case 6:
-                getMoodInsights(storage);
+                deleteTask(storage);
                 break;
             case 7:
+                viewMoodHistory(storage);
+                break;
+            case 8:
+                getMoodInsights(storage);
+                break;
+            case 9:
                 cout << "Thanks for using MooDoo! Take care of yourself! 💙" << endl;
                 return 0;
             default:
