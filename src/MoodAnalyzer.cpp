@@ -144,3 +144,149 @@ std::string MoodAnalyzer::analyzeMoodTrend(const std::vector<MoodEntry>& recentE
         return "📊 Mood Insight: Your mood has been pretty balanced lately. That's actually really healthy!";
     }
 } 
+
+// NEW: Keyword extraction and sentiment analysis methods
+
+std::vector<std::string> MoodAnalyzer::getPositiveKeywords() {
+    return {
+        "happy", "excited", "energized", "motivated", "great", "wonderful", 
+        "amazing", "fantastic", "productive", "accomplished", "proud", "confident",
+        "optimistic", "hopeful", "grateful", "blessed", "lucky", "successful"
+    };
+}
+
+std::vector<std::string> MoodAnalyzer::getNegativeKeywords() {
+    return {
+        "sad", "depressed", "anxious", "worried", "stressed", "overwhelmed",
+        "frustrated", "angry", "tired", "exhausted", "drained", "hopeless",
+        "defeated", "lonely", "isolated", "fearful", "scared", "nervous"
+    };
+}
+
+std::vector<std::string> MoodAnalyzer::getEnergyKeywords() {
+    return {
+        "tired", "exhausted", "drained", "fatigue", "low energy", "sluggish",
+        "energized", "motivated", "active", "awake", "alert", "focused",
+        "rested", "refreshed", "rejuvenated", "lazy", "unmotivated"
+    };
+}
+
+std::vector<std::string> MoodAnalyzer::extractKeywords(const std::string& text) {
+    std::vector<std::string> extractedKeywords;
+    std::string lowerText = text;
+    std::transform(lowerText.begin(), lowerText.end(), lowerText.begin(), ::tolower);
+    
+    // Check for positive keywords
+    for (const auto& keyword : getPositiveKeywords()) {
+        if (lowerText.find(keyword) != std::string::npos) {
+            extractedKeywords.push_back(keyword);
+        }
+    }
+    
+    // Check for negative keywords
+    for (const auto& keyword : getNegativeKeywords()) {
+        if (lowerText.find(keyword) != std::string::npos) {
+            extractedKeywords.push_back(keyword);
+        }
+    }
+    
+    // Check for energy-related keywords
+    for (const auto& keyword : getEnergyKeywords()) {
+        if (lowerText.find(keyword) != std::string::npos) {
+            extractedKeywords.push_back(keyword);
+        }
+    }
+    
+    return extractedKeywords;
+}
+
+double MoodAnalyzer::calculateSentimentScore(const std::string& text) {
+    std::string lowerText = text;
+    std::transform(lowerText.begin(), lowerText.end(), lowerText.begin(), ::tolower);
+    
+    double score = 0.0;
+    int totalWords = 0;
+    
+    // Count positive words
+    for (const auto& keyword : getPositiveKeywords()) {
+        if (lowerText.find(keyword) != std::string::npos) {
+            score += 0.3;  // Positive words add to score
+            totalWords++;
+        }
+    }
+    
+    // Count negative words
+    for (const auto& keyword : getNegativeKeywords()) {
+        if (lowerText.find(keyword) != std::string::npos) {
+            score -= 0.3;  // Negative words subtract from score
+            totalWords++;
+        }
+    }
+    
+    // Normalize score to -1.0 to 1.0 range
+    if (totalWords > 0) {
+        score = score / totalWords;
+    }
+    
+    // Clamp to valid range
+    if (score > 1.0) score = 1.0;
+    if (score < -1.0) score = -1.0;
+    
+    return score;
+}
+
+void MoodAnalyzer::analyzeMoodEntry(MoodEntry& entry) {
+    // Extract keywords automatically from the content
+    entry.extractedKeywords = extractKeywords(entry.content);
+    
+    // Calculate sentiment score
+    entry.sentimentScore = calculateSentimentScore(entry.content);
+    
+    // Add extracted keywords to the main keywords list
+    for (const auto& keyword : entry.extractedKeywords) {
+        // Avoid duplicates
+        if (std::find(entry.keywords.begin(), entry.keywords.end(), keyword) == entry.keywords.end()) {
+            entry.keywords.push_back(keyword);
+        }
+    }
+}
+
+std::string MoodAnalyzer::generateDetailedInsights(const MoodEntry& entry) {
+    std::string insights = "\n🔍 Detailed Mood Analysis:\n";
+    
+    // Show extracted keywords
+    if (!entry.extractedKeywords.empty()) {
+        insights += "📝 Detected keywords: ";
+        for (size_t i = 0; i < entry.extractedKeywords.size(); ++i) {
+            if (i > 0) insights += ", ";
+            insights += entry.extractedKeywords[i];
+        }
+        insights += "\n";
+    }
+    
+    // Show sentiment score
+    insights += "📊 Sentiment score: ";
+    if (entry.sentimentScore > 0.3) {
+        insights += "Positive (" + std::to_string(entry.sentimentScore).substr(0, 4) + ")";
+    } else if (entry.sentimentScore < -0.3) {
+        insights += "Negative (" + std::to_string(entry.sentimentScore).substr(0, 4) + ")";
+    } else {
+        insights += "Neutral (" + std::to_string(entry.sentimentScore).substr(0, 4) + ")";
+    }
+    insights += "\n";
+    
+    // Provide insights based on keywords
+    bool hasEnergyKeywords = false;
+    for (const auto& keyword : entry.extractedKeywords) {
+        if (std::find(getEnergyKeywords().begin(), getEnergyKeywords().end(), keyword) != getEnergyKeywords().end()) {
+            hasEnergyKeywords = true;
+            break;
+        }
+    }
+    
+    if (hasEnergyKeywords) {
+        insights += "💡 Energy level detected in your entry. This helps us provide better task suggestions!\n";
+    }
+    
+    return insights;
+} 

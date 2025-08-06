@@ -42,8 +42,10 @@ struct MoodEntry {
     MoodLevel mood;
     time_t timestamp;
     std::vector<std::string> keywords;
+    std::vector<std::string> extractedKeywords;  // NEW: Auto-extracted keywords
+    double sentimentScore;                       // NEW: Basic sentiment score (-1.0 to 1.0)
     
-    MoodEntry() : id(0), mood(MoodLevel::NEUTRAL), timestamp(time(nullptr)) {}
+    MoodEntry() : id(0), mood(MoodLevel::NEUTRAL), timestamp(time(nullptr)), sentimentScore(0.0) {}
 };
 
 class Storage {

@@ -85,12 +85,18 @@ void addMoodEntry(Storage& storage) {
         default: entry.mood = MoodLevel::NEUTRAL; break;
     }
     
+    // Analyze the mood entry before saving
+    MoodAnalyzer analyzer;
+    analyzer.analyzeMoodEntry(entry);
+    
     if (storage.saveMoodEntry(entry)) {
         cout << "✓ Mood entry saved successfully!" << endl;
         
         // Generate and show supportive message
-        MoodAnalyzer analyzer;
         cout << analyzer.generateSupportiveMessage(entry);
+        
+        // Show detailed insights
+        cout << analyzer.generateDetailedInsights(entry);
         
         // Show task suggestion based on mood
         vector<Task> tasks;

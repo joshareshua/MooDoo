@@ -138,7 +138,8 @@ bool Storage::saveMoodEntry(const MoodEntry& entry) {
          << entry.content << "|"
          << moodToString(entry.mood) << "|"
          << timeToString(entry.timestamp) << "|"
-         << keywordsStr << std::endl;
+         << keywordsStr << "|"
+         << entry.sentimentScore << std::endl;
     
     file.close();
     nextMoodId = std::max(nextMoodId, entry.id + 1);
@@ -160,7 +161,7 @@ bool Storage::loadMoodEntries(std::vector<MoodEntry>& entries) {
         std::string token;
         MoodEntry entry;
         
-        // Parse: id|content|mood|timestamp|keywords
+        // Parse: id|content|mood|timestamp|keywords|sentimentScore
         if (std::getline(ss, token, '|')) entry.id = std::stoi(token);
         if (std::getline(ss, entry.content, '|')) {}
         if (std::getline(ss, token, '|')) entry.mood = stringToMood(token);
@@ -173,6 +174,13 @@ bool Storage::loadMoodEntries(std::vector<MoodEntry>& entries) {
                 if (!keyword.empty()) {
                     entry.keywords.push_back(keyword);
                 }
+            }
+        }
+        if (std::getline(ss, token, '|')) {
+            try {
+                entry.sentimentScore = std::stod(token);
+            } catch (...) {
+                entry.sentimentScore = 0.0;
             }
         }
         
