@@ -48,6 +48,17 @@ void addTask(Storage& storage) {
         default: task.priority = Priority::MEDIUM; break;
     }
     
+    cout << "Difficulty (1=Easy, 2=Medium, 3=Hard): ";
+    int difficultyChoice;
+    cin >> difficultyChoice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    switch(difficultyChoice) {
+        case 1: task.difficulty = TaskDifficulty::EASY; break;
+        case 3: task.difficulty = TaskDifficulty::HARD; break;
+        default: task.difficulty = TaskDifficulty::MEDIUM; break;
+    }
+    
     if (storage.saveTask(task)) {
         cout << "✓ Task saved successfully!" << endl;
     } else {
@@ -190,15 +201,30 @@ void viewTasks(Storage& storage) {
                     default: priorityStr = "Medium"; break;
                 }
                 
+                string difficultyStr;
+                switch(task.difficulty) {
+                    case TaskDifficulty::EASY: difficultyStr = "Easy"; break;
+                    case TaskDifficulty::HARD: difficultyStr = "Hard"; break;
+                    default: difficultyStr = "Medium"; break;
+                }
+                
                 string status = task.completed ? "✓ Done" : "○ Pending";
                 if (task.completed) completedCount++;
                 
-                cout << "[" << task.id << "] " << status << " | " << priorityStr << " | " << task.title << endl;
+                cout << "[" << task.id << "] " << status << " | " << priorityStr << " | " << difficultyStr << " | " << task.title << endl;
                 cout << "    " << task.description << endl << endl;
             }
             
             // Show completion summary
             cout << "--- Progress: " << completedCount << "/" << tasks.size() << " tasks completed ---" << endl;
+            
+            // Show mood-based recommendations if we have recent mood data
+            vector<MoodEntry> recentMoods;
+            if (storage.loadMoodEntries(recentMoods) && !recentMoods.empty()) {
+                MoodAnalyzer analyzer;
+                MoodEntry latestMood = recentMoods.back(); // Get most recent mood
+                cout << analyzer.generateMoodBasedTaskRecommendations(latestMood.mood, tasks) << endl;
+            }
         }
     } else {
         cout << "Error loading tasks" << endl;
@@ -276,6 +302,19 @@ void editTask(Storage& storage) {
         }
     }
     
+    cout << "Change difficulty? (1=Easy, 2=Medium, 3=Hard, 0=keep current): ";
+    int difficultyChoice;
+    cin >> difficultyChoice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (difficultyChoice > 0) {
+        switch(difficultyChoice) {
+            case 1: selectedTask.difficulty = TaskDifficulty::EASY; break;
+            case 3: selectedTask.difficulty = TaskDifficulty::HARD; break;
+            case 2: selectedTask.difficulty = TaskDifficulty::MEDIUM; break;
+        }
+    }
+    
     if (storage.updateTask(selectedTask)) {
         cout << "✓ Task updated successfully!" << endl;
     } else {
@@ -342,6 +381,8 @@ void deleteTask(Storage& storage) {
                      << task.description << "|"
                      << (task.priority == Priority::LOW ? "1" : 
                          task.priority == Priority::HIGH ? "3" : "2") << "|"
+                     << (task.difficulty == TaskDifficulty::EASY ? "1" : 
+                         task.difficulty == TaskDifficulty::HARD ? "3" : "2") << "|"
                      << (task.completed ? "1" : "0") << "|"
                      << task.created << "|"
                      << task.completed_time << endl;

@@ -119,6 +119,72 @@ std::string MoodAnalyzer::generateTaskSuggestion(MoodLevel mood, int completedTa
     return "💡 Suggestion: Check your task list and pick something that feels right for your energy level today.";
 }
 
+std::string MoodAnalyzer::generateMoodBasedTaskRecommendations(MoodLevel mood, const std::vector<Task>& tasks) {
+    if (tasks.empty()) {
+        return "No tasks available. Add some tasks to get personalized recommendations!";
+    }
+    
+    std::string recommendations = "\n🎯 Mood-Based Task Recommendations:\n";
+    
+    // Filter tasks by difficulty based on mood
+    std::vector<Task> easyTasks, mediumTasks, hardTasks;
+    
+    for (const auto& task : tasks) {
+        if (!task.completed) {  // Only show incomplete tasks
+            switch (task.difficulty) {
+                case TaskDifficulty::EASY: easyTasks.push_back(task); break;
+                case TaskDifficulty::MEDIUM: mediumTasks.push_back(task); break;
+                case TaskDifficulty::HARD: hardTasks.push_back(task); break;
+            }
+        }
+    }
+    
+    switch (mood) {
+        case MoodLevel::VERY_LOW:
+        case MoodLevel::LOW:
+            if (!easyTasks.empty()) {
+                recommendations += "💙 Low energy? Try these gentle tasks:\n";
+                for (size_t i = 0; i < std::min(size_t(3), easyTasks.size()); ++i) {
+                    recommendations += "   • " + easyTasks[i].title + "\n";
+                }
+            } else {
+                recommendations += "💙 Low energy day - maybe add some easy tasks like 'drink water' or 'make bed'?\n";
+            }
+            break;
+            
+        case MoodLevel::NEUTRAL:
+            if (!mediumTasks.empty()) {
+                recommendations += "😐 Balanced mood? These medium tasks might feel right:\n";
+                for (size_t i = 0; i < std::min(size_t(3), mediumTasks.size()); ++i) {
+                    recommendations += "   • " + mediumTasks[i].title + "\n";
+                }
+            } else if (!easyTasks.empty()) {
+                recommendations += "😐 Try these manageable tasks:\n";
+                for (size_t i = 0; i < std::min(size_t(2), easyTasks.size()); ++i) {
+                    recommendations += "   • " + easyTasks[i].title + "\n";
+                }
+            }
+            break;
+            
+        case MoodLevel::GOOD:
+        case MoodLevel::EXCELLENT:
+            if (!hardTasks.empty()) {
+                recommendations += "✨ High energy! Perfect for challenging tasks:\n";
+                for (size_t i = 0; i < std::min(size_t(3), hardTasks.size()); ++i) {
+                    recommendations += "   • " + hardTasks[i].title + "\n";
+                }
+            } else if (!mediumTasks.empty()) {
+                recommendations += "✨ Great mood! Try these engaging tasks:\n";
+                for (size_t i = 0; i < std::min(size_t(3), mediumTasks.size()); ++i) {
+                    recommendations += "   • " + mediumTasks[i].title + "\n";
+                }
+            }
+            break;
+    }
+    
+    return recommendations;
+}
+
 std::string MoodAnalyzer::analyzeMoodTrend(const std::vector<MoodEntry>& recentEntries) {
     if (recentEntries.size() < 2) {
         return "Keep logging your mood to see patterns over time!";

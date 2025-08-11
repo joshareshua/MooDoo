@@ -35,6 +35,21 @@ Priority Storage::stringToPriority(const std::string& str) {
     return Priority::MEDIUM; // default
 }
 
+std::string Storage::difficultyToString(TaskDifficulty difficulty) {
+    switch (difficulty) {
+        case TaskDifficulty::EASY: return "1";
+        case TaskDifficulty::MEDIUM: return "2";
+        case TaskDifficulty::HARD: return "3";
+        default: return "2";
+    }
+}
+
+TaskDifficulty Storage::stringToDifficulty(const std::string& str) {
+    if (str == "1") return TaskDifficulty::EASY;
+    if (str == "3") return TaskDifficulty::HARD;
+    return TaskDifficulty::MEDIUM; // default
+}
+
 std::string Storage::moodToString(MoodLevel mood) {
     switch (mood) {
         case MoodLevel::VERY_LOW: return "1";
@@ -78,6 +93,7 @@ bool Storage::saveTask(const Task& task) {
          << task.title << "|"
          << task.description << "|"
          << priorityToString(task.priority) << "|"
+         << difficultyToString(task.difficulty) << "|"
          << (task.completed ? "1" : "0") << "|"
          << timeToString(task.created) << "|"
          << timeToString(task.completed_time) << std::endl;
@@ -102,11 +118,12 @@ bool Storage::loadTasks(std::vector<Task>& tasks) {
         std::string token;
         Task task;
         
-        // Parse: id|title|description|priority|completed|created|completed_time
+        // Parse: id|title|description|priority|difficulty|completed|created|completed_time
         if (std::getline(ss, token, '|')) task.id = std::stoi(token);
         if (std::getline(ss, task.title, '|')) {}
         if (std::getline(ss, task.description, '|')) {}
         if (std::getline(ss, token, '|')) task.priority = stringToPriority(token);
+        if (std::getline(ss, token, '|')) task.difficulty = stringToDifficulty(token);
         if (std::getline(ss, token, '|')) task.completed = (token == "1");
         if (std::getline(ss, token, '|')) task.created = stringToTime(token);
         if (std::getline(ss, token, '|')) task.completed_time = stringToTime(token);
@@ -229,6 +246,7 @@ bool Storage::updateTask(const Task& updatedTask) {
              << task.title << "|"
              << task.description << "|"
              << priorityToString(task.priority) << "|"
+             << difficultyToString(task.difficulty) << "|"
              << (task.completed ? "1" : "0") << "|"
              << timeToString(task.created) << "|"
              << timeToString(task.completed_time) << std::endl;

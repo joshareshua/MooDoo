@@ -27,6 +27,9 @@ public:
     // Generate task suggestions based on mood
     std::string generateTaskSuggestion(MoodLevel mood, int completedTasks, int totalTasks);
     
+    // NEW: Generate mood-based task recommendations
+    std::string generateMoodBasedTaskRecommendations(MoodLevel mood, const std::vector<Task>& tasks);
+    
     // Analyze mood patterns
     std::string analyzeMoodTrend(const std::vector<MoodEntry>& recentEntries);
     

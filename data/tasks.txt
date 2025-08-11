@@ -3,3 +3,4 @@
 2|Buy groceries|Milk, bread, eggs, and vegetables|1|0|1753799026|0
 1|Complete project proposal|Write the initial draft for the new feature|3|0|1753972762|0
 2|Buy groceries|Milk, bread, eggs, and vegetables|1|0|1753972762|0
+1|Study for Interview|Technical SWE interview|3|3|0|1754878695|0

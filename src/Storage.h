@@ -15,6 +15,12 @@ enum class Priority {
     HIGH = 3
 };
 
+enum class TaskDifficulty {
+    EASY = 1,
+    MEDIUM = 2,
+    HARD = 3
+};
+
 enum class MoodLevel {
     VERY_LOW = 1,
     LOW = 2,
@@ -28,12 +34,13 @@ struct Task {
     std::string title;
     std::string description;
     Priority priority;
+    TaskDifficulty difficulty;
     bool completed;
     time_t created;
     time_t completed_time;
     
-    Task() : id(0), priority(Priority::MEDIUM), completed(false), 
-             created(time(nullptr)), completed_time(0) {}
+    Task() : id(0), priority(Priority::MEDIUM), difficulty(TaskDifficulty::MEDIUM), 
+             completed(false), created(time(nullptr)), completed_time(0) {}
 };
 
 struct MoodEntry {
@@ -58,6 +65,8 @@ private:
     // Helper methods
     std::string priorityToString(Priority priority);
     Priority stringToPriority(const std::string& str);
+    std::string difficultyToString(TaskDifficulty difficulty);
+    TaskDifficulty stringToDifficulty(const std::string& str);
     std::string moodToString(MoodLevel mood);
     MoodLevel stringToMood(const std::string& str);
     std::string timeToString(time_t time);
