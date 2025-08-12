@@ -20,8 +20,9 @@ void showMenu() {
     cout << "6. Delete a task" << endl;
     cout << "7. View mood history" << endl;
     cout << "8. Get mood insights" << endl;
-    cout << "9. Exit" << endl;
-    cout << "Choose an option (1-9): ";
+    cout << "9. Daily summary" << endl;
+    cout << "10. Exit" << endl;
+    cout << "Choose an option (1-10): ";
 }
 
 void addTask(Storage& storage) {
@@ -462,6 +463,105 @@ void getMoodInsights(Storage& storage) {
     }
 }
 
+void showDailySummary(Storage& storage) {
+    clearScreen();
+    cout << "=== Daily Summary ===" << endl;
+    
+    // Get today's date
+    time_t now = time(nullptr);
+    tm* today = localtime(&now);
+    int todayDay = today->tm_mday;
+    int todayMonth = today->tm_mon + 1;
+    int todayYear = today->tm_year + 1900;
+    
+    cout << "📅 Date: " << todayMonth << "/" << todayDay << "/" << todayYear << endl << endl;
+    
+    // Load today's mood entries
+    vector<MoodEntry> allMoods;
+    vector<MoodEntry> todayMoods;
+    if (storage.loadMoodEntries(allMoods)) {
+        for (const auto& mood : allMoods) {
+            tm* moodTime = localtime(&mood.timestamp);
+            if (moodTime->tm_mday == todayDay && 
+                moodTime->tm_mon == today->tm_mon && 
+                moodTime->tm_year == today->tm_year) {
+                todayMoods.push_back(mood);
+            }
+        }
+    }
+    
+    // Show mood summary
+    if (todayMoods.empty()) {
+        cout << "💭 No mood entries today. How are you feeling?" << endl;
+    } else if (todayMoods.size() == 1) {
+        string moodStr;
+        switch(todayMoods[0].mood) {
+            case MoodLevel::VERY_LOW: moodStr = "😞 Very Low"; break;
+            case MoodLevel::LOW: moodStr = "😔 Low"; break;
+            case MoodLevel::NEUTRAL: moodStr = "😐 Neutral"; break;
+            case MoodLevel::GOOD: moodStr = "😊 Good"; break;
+            case MoodLevel::EXCELLENT: moodStr = "😄 Excellent"; break;
+        }
+        cout << "💭 Today's Mood: " << moodStr << endl;
+    } else {
+        cout << "💭 Mood Trend: ";
+        string firstMood, lastMood;
+        switch(todayMoods.front().mood) {
+            case MoodLevel::VERY_LOW: firstMood = "😞"; break;
+            case MoodLevel::LOW: firstMood = "😔"; break;
+            case MoodLevel::NEUTRAL: firstMood = "😐"; break;
+            case MoodLevel::GOOD: firstMood = "😊"; break;
+            case MoodLevel::EXCELLENT: firstMood = "😄"; break;
+        }
+        switch(todayMoods.back().mood) {
+            case MoodLevel::VERY_LOW: lastMood = "😞"; break;
+            case MoodLevel::LOW: lastMood = "😔"; break;
+            case MoodLevel::NEUTRAL: lastMood = "😐"; break;
+            case MoodLevel::GOOD: lastMood = "😊"; break;
+            case MoodLevel::EXCELLENT: lastMood = "😄"; break;
+        }
+        cout << firstMood << " → " << lastMood << endl;
+    }
+    
+    // Load today's tasks
+    vector<Task> allTasks;
+    int completedToday = 0, totalToday = 0;
+    if (storage.loadTasks(allTasks)) {
+        for (const auto& task : allTasks) {
+            tm* taskTime = localtime(&task.created);
+            if (taskTime->tm_mday == todayDay && 
+                taskTime->tm_mon == today->tm_mon && 
+                taskTime->tm_year == today->tm_year) {
+                totalToday++;
+                if (task.completed) completedToday++;
+            }
+        }
+    }
+    
+    // Show task summary
+    cout << "✅ Tasks: " << completedToday << "/" << totalToday << " completed";
+    if (totalToday > 0) {
+        int percent = (completedToday * 100) / totalToday;
+        cout << " (" << percent << "%)";
+    }
+    cout << endl;
+    
+    // Show encouraging message
+    cout << "\n💪 ";
+    if (completedToday == 0 && totalToday == 0) {
+        cout << "No tasks today. Ready to start fresh tomorrow!";
+    } else if (completedToday == 0) {
+        cout << "Every journey starts with one step. You've got this!";
+    } else if (completedToday == totalToday) {
+        cout << "Amazing! You completed everything today!";
+    } else if (completedToday > totalToday / 2) {
+        cout << "Great progress! You're building momentum!";
+    } else {
+        cout << "You're making progress. Every task counts!";
+    }
+    cout << endl;
+}
+
 int main() {
     Storage storage;
     int choice;
@@ -500,6 +600,9 @@ int main() {
                 getMoodInsights(storage);
                 break;
             case 9:
+                showDailySummary(storage);
+                break;
+            case 10:
                 cout << "Thanks for using MooDoo! Take care of yourself! 💙" << endl;
                 return 0;
             default:
