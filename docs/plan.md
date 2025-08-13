@@ -80,11 +80,13 @@ MooDoo is a mental health-aware planner that adapts to the user's emotional stat
    - **NEW: Daily mood summary & progress tracking**
 
 ### Phase 2: Intelligence
-1. **MoodEngine Enhancement**
-   - Keyword extraction
-   - Sentiment analysis
-   - Response generation
-   - Context awareness
+1. **MoodEngine Enhancement** ✅
+   - Keyword extraction ✅
+   - Sentiment analysis ✅
+   - Response generation ✅
+   - Context awareness ✅
+   - **NEW: Weekly mood pattern recognition**
+   - **NEW: Productivity correlation insights**
 
 2. **AI Integration** (Future)
    - OpenAI API integration

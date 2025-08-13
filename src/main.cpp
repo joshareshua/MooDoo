@@ -21,8 +21,9 @@ void showMenu() {
     cout << "7. View mood history" << endl;
     cout << "8. Get mood insights" << endl;
     cout << "9. Daily summary" << endl;
-    cout << "10. Exit" << endl;
-    cout << "Choose an option (1-10): ";
+    cout << "10. Weekly patterns" << endl;
+    cout << "11. Exit" << endl;
+    cout << "Choose an option (1-11): ";
 }
 
 void addTask(Storage& storage) {
@@ -562,6 +563,21 @@ void showDailySummary(Storage& storage) {
     cout << endl;
 }
 
+void showWeeklyPatterns(Storage& storage) {
+    clearScreen();
+    cout << "=== Weekly Mood & Productivity Patterns ===" << endl;
+    
+    vector<MoodEntry> moods;
+    vector<Task> tasks;
+    
+    if (storage.loadMoodEntries(moods) && storage.loadTasks(tasks)) {
+        MoodAnalyzer analyzer;
+        cout << analyzer.analyzeWeeklyPatterns(moods, tasks) << endl;
+    } else {
+        cout << "Error loading data for pattern analysis." << endl;
+    }
+}
+
 int main() {
     Storage storage;
     int choice;
@@ -603,6 +619,9 @@ int main() {
                 showDailySummary(storage);
                 break;
             case 10:
+                showWeeklyPatterns(storage);
+                break;
+            case 11:
                 cout << "Thanks for using MooDoo! Take care of yourself! 💙" << endl;
                 return 0;
             default:

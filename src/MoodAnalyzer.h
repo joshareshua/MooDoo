@@ -30,6 +30,9 @@ public:
     // NEW: Generate mood-based task recommendations
     std::string generateMoodBasedTaskRecommendations(MoodLevel mood, const std::vector<Task>& tasks);
     
+    // NEW: Analyze weekly mood and productivity patterns
+    std::string analyzeWeeklyPatterns(const std::vector<MoodEntry>& moods, const std::vector<Task>& tasks);
+    
     // Analyze mood patterns
     std::string analyzeMoodTrend(const std::vector<MoodEntry>& recentEntries);
     

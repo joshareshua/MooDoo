@@ -185,6 +185,94 @@ std::string MoodAnalyzer::generateMoodBasedTaskRecommendations(MoodLevel mood, c
     return recommendations;
 }
 
+std::string MoodAnalyzer::analyzeWeeklyPatterns(const std::vector<MoodEntry>& moods, const std::vector<Task>& tasks) {
+    if (moods.empty()) {
+        return "No mood data available. Add some mood entries to see patterns!";
+    }
+    
+    // Get last 7 days of data
+    time_t weekAgo = time(nullptr) - (7 * 24 * 60 * 60);
+    std::vector<MoodEntry> recentMoods;
+    std::vector<Task> recentTasks;
+    
+    for (const auto& mood : moods) {
+        if (mood.timestamp >= weekAgo) {
+            recentMoods.push_back(mood);
+        }
+    }
+    
+    for (const auto& task : tasks) {
+        if (task.created >= weekAgo) {
+            recentTasks.push_back(task);
+        }
+    }
+    
+    if (recentMoods.empty()) {
+        return "No mood data from the past week. Keep logging to see patterns!";
+    }
+    
+    // Calculate average mood for the week
+    double totalMood = 0;
+    for (const auto& mood : recentMoods) {
+        totalMood += static_cast<int>(mood.mood);
+    }
+    double avgMood = totalMood / recentMoods.size();
+    
+    // Calculate task completion rate
+    int completedTasks = 0, totalTasks = 0;
+    for (const auto& task : recentTasks) {
+        totalTasks++;
+        if (task.completed) completedTasks++;
+    }
+    
+    int completionRate = 0;
+    if (totalTasks > 0) {
+        completionRate = (completedTasks * 100) / totalTasks;
+    }
+    
+    // Generate insights
+    std::string patterns = "\n📊 Weekly Mood & Productivity Patterns:\n";
+    patterns += "💭 Average Mood: ";
+    
+    if (avgMood >= 4.5) patterns += "😄 Excellent";
+    else if (avgMood >= 3.5) patterns += "😊 Good";
+    else if (avgMood >= 2.5) patterns += "😐 Neutral";
+    else patterns += "😔 Low";
+    patterns += " (" + std::to_string(avgMood).substr(0, 3) + "/5)\n";
+    
+    if (totalTasks > 0) {
+        patterns += "✅ Task Completion: " + std::to_string(completedTasks) + "/" + 
+                   std::to_string(totalTasks) + " (" + std::to_string(completionRate) + "%)\n";
+    }
+    
+    // Find patterns
+    if (recentMoods.size() >= 3) {
+        if (avgMood >= 4.0 && completionRate >= 70) {
+            patterns += "💪 Pattern: You're in a great productive rhythm!\n";
+        } else if (avgMood <= 2.5 && completionRate <= 30) {
+            patterns += "💙 Pattern: You're having a challenging week. That's okay!\n";
+        } else if (avgMood >= 3.5 && completionRate >= 50) {
+            patterns += "📈 Pattern: Good mood is helping your productivity!\n";
+        } else {
+            patterns += "🔄 Pattern: Mixed week - you're adapting well!\n";
+        }
+    }
+    
+    // Suggestions
+    patterns += "\n🎯 Suggestions:\n";
+    if (avgMood < 3.0) {
+        patterns += "   • Focus on self-care and gentle tasks\n";
+        patterns += "   • Remember: low productivity days are normal\n";
+    } else if (completionRate < 50) {
+        patterns += "   • Try breaking big tasks into smaller steps\n";
+        patterns += "   • Your mood is good - channel that energy!\n";
+    } else {
+        patterns += "   • You're doing great! Keep this momentum going\n";
+    }
+    
+    return patterns;
+}
+
 std::string MoodAnalyzer::analyzeMoodTrend(const std::vector<MoodEntry>& recentEntries) {
     if (recentEntries.size() < 2) {
         return "Keep logging your mood to see patterns over time!";
