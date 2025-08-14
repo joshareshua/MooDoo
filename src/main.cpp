@@ -156,10 +156,15 @@ void markTaskComplete(Storage& storage) {
         cout << "[" << (i + 1) << "] " << status << " | " << priorityStr << " | " << tasks[i].title << endl;
     }
     
-    cout << "\nEnter task number to toggle (1-" << tasks.size() << "): ";
+    cout << "\nEnter task number to toggle (1-" << tasks.size() << ") or 0 to go back: ";
     int taskChoice;
     cin >> taskChoice;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (taskChoice == 0) {
+        cout << "Going back to main menu..." << endl;
+        return;
+    }
     
     if (taskChoice < 1 || taskChoice > static_cast<int>(tasks.size())) {
         cout << "Invalid task number!" << endl;
@@ -263,10 +268,15 @@ void editTask(Storage& storage) {
         cout << "[" << (i + 1) << "] " << status << " | " << priorityStr << " | " << tasks[i].title << endl;
     }
     
-    cout << "\nEnter task number to edit (1-" << tasks.size() << "): ";
+    cout << "\nEnter task number to edit (1-" << tasks.size() << ") or 0 to go back: ";
     int taskChoice;
     cin >> taskChoice;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (taskChoice == 0) {
+        cout << "Going back to main menu..." << endl;
+        return;
+    }
     
     if (taskChoice < 1 || taskChoice > static_cast<int>(tasks.size())) {
         cout << "Invalid task number!" << endl;
@@ -354,10 +364,15 @@ void deleteTask(Storage& storage) {
         cout << "[" << (i + 1) << "] " << status << " | " << priorityStr << " | " << tasks[i].title << endl;
     }
     
-    cout << "\nEnter task number to delete (1-" << tasks.size() << "): ";
+    cout << "\nEnter task number to delete (1-" << tasks.size() << ") or 0 to go back: ";
     int taskChoice;
     cin >> taskChoice;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (taskChoice == 0) {
+        cout << "Going back to main menu..." << endl;
+        return;
+    }
     
     if (taskChoice < 1 || taskChoice > static_cast<int>(tasks.size())) {
         cout << "Invalid task number!" << endl;

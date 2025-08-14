@@ -8,20 +8,20 @@ MooDoo is a planner and journal application designed specifically for people wit
 - Get reassurance when they're not as productive
 - Leverage positive moods for enhanced productivity
 
-## Core Features (MVP) ✅
-- ✅ Create, update, and delete daily tasks
-- ✅ Journal mood entries (e.g. "Feeling tired today...")
-- ✅ Mood-based suggestions (e.g. "Let's take it slow today")
-- ✅ Daily encouragement/motivation messages
-- ✅ Persist user data (local file storage)
-- ✅ Clean CLI interface
-- ✅ **Task difficulty levels** (Easy/Medium/Hard)
-- ✅ **Mood-based task recommendations**
-- ✅ **Daily mood summary & progress tracking**
-- ✅ **Weekly mood & productivity patterns**
-- ✅ **Gentle reminders (ADHD-friendly)**
+## Core Features (MVP)
+- Create, update, and delete daily tasks
+- Journal mood entries (e.g. "Feeling tired today...")
+- Mood-based suggestions (e.g. "Let's take it slow today")
+- Daily encouragement/motivation messages
+- Persist user data (local file storage)
+- Clean CLI interface
+- **Task difficulty levels** (Easy/Medium/Hard)
+- **Mood-based task recommendations**
+- **Daily mood summary & progress tracking**
+- **Weekly mood & productivity patterns**
+- **Gentle reminders (ADHD-friendly)**
 
-## Current Feature Set ✅
+## Current Feature Set
 
 ### Task Management
 - **Smart Task Creation**: Add tasks with priority and difficulty levels
@@ -99,7 +99,7 @@ make check
 
 ##  Development Roadmap
 
-### Phase 1: Core Implementation ✅
+### Phase 1: Core Implementation
 - [x] Project structure setup
 - [x] TaskManager implementation
 - [x] JournalManager implementation

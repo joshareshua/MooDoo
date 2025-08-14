@@ -257,26 +257,186 @@ bool Storage::updateTask(const Task& updatedTask) {
 }
 
 bool Storage::deleteTask(int taskId) {
-    // TODO: Implement task deletion
-    return false;
+    // Load all tasks
+    std::vector<Task> tasks;
+    if (!loadTasks(tasks)) {
+        return false;
+    }
+    
+    // Find and remove the task
+    auto it = std::find_if(tasks.begin(), tasks.end(), 
+                          [taskId](const Task& task) { return task.id == taskId; });
+    
+    if (it == tasks.end()) {
+        return false; // Task not found
+    }
+    
+    tasks.erase(it);
+    
+    // Rewrite file without the deleted task
+    std::ofstream file(tasksFile, std::ios::trunc);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    for (const auto& task : tasks) {
+        file << task.id << "|"
+             << task.title << "|"
+             << task.description << "|"
+             << priorityToString(task.priority) << "|"
+             << difficultyToString(task.difficulty) << "|"
+             << (task.completed ? "1" : "0") << "|"
+             << timeToString(task.created) << "|"
+             << timeToString(task.completed_time) << std::endl;
+    }
+    
+    file.close();
+    return true;
 }
 
 bool Storage::updateMoodEntry(const MoodEntry& entry) {
-    // TODO: Implement mood entry updating
-    return false;
+    // Load all mood entries
+    std::vector<MoodEntry> entries;
+    if (!loadMoodEntries(entries)) {
+        return false;
+    }
+    
+    // Find and update the entry
+    for (auto& moodEntry : entries) {
+        if (moodEntry.id == entry.id) {
+            moodEntry = entry;
+            break;
+        }
+    }
+    
+    // Rewrite file with updated data
+    std::ofstream file(journalFile, std::ios::trunc);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    for (const auto& moodEntry : entries) {
+        // Convert keywords to comma-separated string
+        std::string keywordsStr;
+        for (size_t i = 0; i < moodEntry.keywords.size(); ++i) {
+            if (i > 0) keywordsStr += ",";
+            keywordsStr += moodEntry.keywords[i];
+        }
+        
+        file << moodEntry.id << "|"
+             << moodEntry.content << "|"
+             << moodToString(moodEntry.mood) << "|"
+             << timeToString(moodEntry.timestamp) << "|"
+             << keywordsStr << "|"
+             << moodEntry.sentimentScore << std::endl;
+    }
+    
+    file.close();
+    return true;
 }
 
 bool Storage::deleteMoodEntry(int entryId) {
-    // TODO: Implement mood entry deletion
-    return false;
+    // Load all mood entries
+    std::vector<MoodEntry> entries;
+    if (!loadMoodEntries(entries)) {
+        return false;
+    }
+    
+    // Find and remove the entry
+    auto it = std::find_if(entries.begin(), entries.end(), 
+                          [entryId](const MoodEntry& entry) { return entry.id == entryId; });
+    
+    if (it == entries.end()) {
+        return false; // Entry not found
+    }
+    
+    entries.erase(it);
+    
+    // Rewrite file without the deleted entry
+    std::ofstream file(journalFile, std::ios::trunc);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    for (const auto& entry : entries) {
+        // Convert keywords to comma-separated string
+        std::string keywordsStr;
+        for (size_t i = 0; i < entry.keywords.size(); ++i) {
+            if (i > 0) keywordsStr += ",";
+            keywordsStr += entry.keywords[i];
+        }
+        
+        file << entry.id << "|"
+             << entry.content << "|"
+             << moodToString(entry.mood) << "|"
+             << timeToString(entry.timestamp) << "|"
+             << keywordsStr << "|"
+             << entry.sentimentScore << std::endl;
+    }
+    
+    file.close();
+    return true;
 }
 
 bool Storage::backupData() {
-    // TODO: Implement backup functionality
-    return false;
+    // Create backup directory
+    std::filesystem::create_directories("data/backup");
+    
+    // Get current timestamp for backup filename
+    time_t now = time(nullptr);
+    std::string timestamp = std::to_string(now);
+    
+    // Backup tasks file
+    std::string tasksBackup = "data/backup/tasks_" + timestamp + ".txt";
+    if (!std::filesystem::copy_file(tasksFile, tasksBackup)) {
+        return false;
+    }
+    
+    // Backup journal file
+    std::string journalBackup = "data/backup/journal_" + timestamp + ".txt";
+    if (!std::filesystem::copy_file(journalFile, journalBackup)) {
+        return false;
+    }
+    
+    return true;
 }
 
 bool Storage::restoreData() {
-    // TODO: Implement restore functionality
-    return false;
+    // List available backups
+    std::cout << "Available backups:" << std::endl;
+    std::vector<std::string> backups;
+    
+    for (const auto& entry : std::filesystem::directory_iterator("data/backup")) {
+        if (entry.is_regular_file()) {
+            backups.push_back(entry.path().filename().string());
+            std::cout << "  " << entry.path().filename().string() << std::endl;
+        }
+    }
+    
+    if (backups.empty()) {
+        std::cout << "No backups found." << std::endl;
+        return false;
+    }
+    
+    // For now, restore the most recent backup
+    // In a real app, you'd ask user which backup to restore
+    std::string latestBackup = backups.back();
+    
+    // Restore tasks
+    std::string tasksBackup = "data/backup/" + latestBackup;
+    if (latestBackup.find("tasks_") == 0) {
+        if (!std::filesystem::copy_file(tasksBackup, tasksFile, std::filesystem::copy_options::overwrite_existing)) {
+            return false;
+        }
+    }
+    
+    // Restore journal
+    std::string journalBackup = "data/backup/" + latestBackup;
+    if (latestBackup.find("journal_") == 0) {
+        if (!std::filesystem::copy_file(journalBackup, journalFile, std::filesystem::copy_options::overwrite_existing)) {
+            return false;
+        }
+    }
+    
+    return true;
 }
