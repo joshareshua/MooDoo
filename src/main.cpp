@@ -22,8 +22,9 @@ void showMenu() {
     cout << "8. Get mood insights" << endl;
     cout << "9. Daily summary" << endl;
     cout << "10. Weekly patterns" << endl;
-    cout << "11. Exit" << endl;
-    cout << "Choose an option (1-11): ";
+    cout << "11. Gentle reminders" << endl;
+    cout << "12. Exit" << endl;
+    cout << "Choose an option (1-12): ";
 }
 
 void addTask(Storage& storage) {
@@ -578,6 +579,111 @@ void showWeeklyPatterns(Storage& storage) {
     }
 }
 
+void showGentleReminders(Storage& storage) {
+    clearScreen();
+    cout << "=== Gentle Reminders 💙 ===" << endl;
+    
+    vector<MoodEntry> moods;
+    vector<Task> tasks;
+    
+    if (!storage.loadMoodEntries(moods) || !storage.loadTasks(tasks)) {
+        cout << "Unable to load your data. Take a deep breath and try again." << endl;
+        return;
+    }
+    
+    // Get current mood (most recent)
+    MoodLevel currentMood = MoodLevel::NEUTRAL;
+    if (!moods.empty()) {
+        currentMood = moods.back().mood;
+    }
+    
+    // Find pending tasks
+    vector<Task> pendingTasks;
+    for (const auto& task : tasks) {
+        if (!task.completed) {
+            pendingTasks.push_back(task);
+        }
+    }
+    
+    if (pendingTasks.empty()) {
+        cout << "🎉 Amazing! You have no pending tasks!" << endl;
+        cout << "Take a moment to celebrate your productivity." << endl;
+        return;
+    }
+    
+    // Show gentle, mood-aware reminders
+    cout << "You have " << pendingTasks.size() << " task(s) waiting for you." << endl;
+    cout << "Here are some gentle suggestions:\n" << endl;
+    
+    // Mood-based gentle approach
+    switch (currentMood) {
+        case MoodLevel::VERY_LOW:
+        case MoodLevel::LOW:
+            cout << "💙 I can see you're having a low-energy day." << endl;
+            cout << "That's completely okay - we all have them!" << endl;
+            cout << "Maybe just pick ONE tiny thing that feels manageable?\n" << endl;
+            
+            // Suggest easiest tasks first
+            for (const auto& task : pendingTasks) {
+                if (task.difficulty == TaskDifficulty::EASY) {
+                    cout << "💡 Gentle suggestion: '" << task.title << "'" << endl;
+                    cout << "   This is marked as easy - it might feel doable right now." << endl;
+                    break;
+                }
+            }
+            break;
+            
+        case MoodLevel::NEUTRAL:
+            cout << "😐 You're in a balanced place today." << endl;
+            cout << "This might be a good time to tackle something medium-sized.\n" << endl;
+            
+            // Suggest medium tasks
+            for (const auto& task : pendingTasks) {
+                if (task.difficulty == TaskDifficulty::MEDIUM) {
+                    cout << "💡 Suggestion: '" << task.title << "'" << endl;
+                    cout << "   This feels like the right energy level for you." << endl;
+                    break;
+                }
+            }
+            break;
+            
+        case MoodLevel::GOOD:
+        case MoodLevel::EXCELLENT:
+            cout << "✨ You're feeling great today!" << endl;
+            cout << "This is perfect energy for getting things done.\n" << endl;
+            
+            // Suggest harder tasks
+            for (const auto& task : pendingTasks) {
+                if (task.difficulty == TaskDifficulty::HARD) {
+                    cout << "💡 Great opportunity: '" << task.title << "'" << endl;
+                    cout << "   You have the energy for this challenging task!" << endl;
+                    break;
+                }
+            }
+            break;
+    }
+    
+    // Show all pending tasks gently
+    cout << "\n📋 Here are all your pending tasks:" << endl;
+    for (size_t i = 0; i < pendingTasks.size(); i++) {
+        string difficultyStr;
+        switch(pendingTasks[i].difficulty) {
+            case TaskDifficulty::EASY: difficultyStr = "Easy"; break;
+            case TaskDifficulty::HARD: difficultyStr = "Hard"; break;
+            default: difficultyStr = "Medium"; break;
+        }
+        
+        cout << "   " << (i + 1) << ". " << pendingTasks[i].title << " (" << difficultyStr << ")" << endl;
+    }
+    
+    // Gentle closing message
+    cout << "\n💙 Remember:" << endl;
+    cout << "   • You don't have to do everything today" << endl;
+    cout << "   • Even one small task is progress" << endl;
+    cout << "   • Your worth isn't measured by productivity" << endl;
+    cout << "   • Take breaks when you need them" << endl;
+}
+
 int main() {
     Storage storage;
     int choice;
@@ -622,6 +728,9 @@ int main() {
                 showWeeklyPatterns(storage);
                 break;
             case 11:
+                showGentleReminders(storage);
+                break;
+            case 12:
                 cout << "Thanks for using MooDoo! Take care of yourself! 💙" << endl;
                 return 0;
             default:

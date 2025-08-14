@@ -78,6 +78,9 @@ MooDoo is a mental health-aware planner that adapts to the user's emotional stat
    - User input handling
    - Basic output formatting
    - **NEW: Daily mood summary & progress tracking**
+   - **NEW: Weekly mood & productivity patterns**
+   - **NEW: Mood-based task recommendations**
+   - **NEW: Gentle reminders (ADHD-friendly)**
 
 ### Phase 2: Intelligence
 1. **MoodEngine Enhancement** ✅
