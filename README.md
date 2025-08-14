@@ -8,13 +8,38 @@ MooDoo is a planner and journal application designed specifically for people wit
 - Get reassurance when they're not as productive
 - Leverage positive moods for enhanced productivity
 
-## Core Features (MVP)
-- Create, update, and delete daily tasks
-- Journal mood entries (e.g. "Feeling tired today...")
-- Mood-based suggestions (e.g. "Let's take it slow today")
-- Daily encouragement/motivation messages
-- Persist user data (local file storage)
-- Clean CLI interface
+## Core Features (MVP) ✅
+- ✅ Create, update, and delete daily tasks
+- ✅ Journal mood entries (e.g. "Feeling tired today...")
+- ✅ Mood-based suggestions (e.g. "Let's take it slow today")
+- ✅ Daily encouragement/motivation messages
+- ✅ Persist user data (local file storage)
+- ✅ Clean CLI interface
+- ✅ **Task difficulty levels** (Easy/Medium/Hard)
+- ✅ **Mood-based task recommendations**
+- ✅ **Daily mood summary & progress tracking**
+- ✅ **Weekly mood & productivity patterns**
+- ✅ **Gentle reminders (ADHD-friendly)**
+
+## Current Feature Set ✅
+
+### Task Management
+- **Smart Task Creation**: Add tasks with priority and difficulty levels
+- **Mood-Aware Suggestions**: Get task recommendations based on current energy level
+- **Progress Tracking**: See completion rates and daily progress
+- **Gentle Reminders**: ADHD-friendly task suggestions without pressure
+
+### Mood & Mental Health
+- **Daily Mood Logging**: Track how you're feeling throughout the day
+- **Mood Analysis**: Get insights about your emotional patterns
+- **Weekly Patterns**: See correlations between mood and productivity
+- **Supportive Messages**: Encouraging responses based on your current state
+
+### ADHD-Specific Features
+- **Non-Judgmental Approach**: Never shames for low productivity days
+- **Energy-Level Matching**: Suggests tasks that fit your current capacity
+- **Pattern Recognition**: Helps identify what helps/hurts your productivity
+- **Gentle Encouragement**: Soft reminders and supportive messaging
 
 ##  System Architecture
 The application is built with a modular, object-oriented design:
@@ -74,19 +99,21 @@ make check
 
 ##  Development Roadmap
 
-### Phase 1: Core Implementation 
+### Phase 1: Core Implementation ✅
 - [x] Project structure setup
-- [ ] TaskManager implementation
-- [ ] JournalManager implementation
-- [ ] MoodEngine implementation
-- [ ] Storage system
-- [ ] Basic CLI interface
+- [x] TaskManager implementation
+- [x] JournalManager implementation
+- [x] MoodEngine implementation
+- [x] Storage system
+- [x] Basic CLI interface
 
-### Phase 2: Enhancement
+### Phase 2: Enhancement (In Progress)
+- [x] Enhanced mood analysis (keyword extraction, sentiment analysis)
+- [x] Statistics and insights (daily/weekly patterns)
+- [x] Smart mood pattern recognition
+- [x] Productivity correlation insights
 - [ ] AI integration for smart responses
 - [ ] JSON data format
-- [ ] Enhanced mood analysis
-- [ ] Statistics and insights
 
 ### Phase 3: Advanced Features
 - [ ] GUI interface (Raylib/Qt/ImGui)
