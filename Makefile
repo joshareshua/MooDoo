@@ -53,9 +53,11 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = src/main_gui.cpp \
-		src/MainWindow.cpp moc_MainWindow.cpp
+		src/MainWindow.cpp \
+		src/Storage.cpp moc_MainWindow.cpp
 OBJECTS       = main_gui.o \
 		MainWindow.o \
+		Storage.o \
 		moc_MainWindow.o
 DIST          = /opt/homebrew/share/qt/mkspecs/features/spec_pre.prf \
 		/opt/homebrew/share/qt/mkspecs/features/device_config.prf \
@@ -430,7 +432,8 @@ DIST          = /opt/homebrew/share/qt/mkspecs/features/spec_pre.prf \
 		/opt/homebrew/share/qt/mkspecs/features/yacc.prf \
 		/opt/homebrew/share/qt/mkspecs/features/lex.prf \
 		MooDooGUI.pro src/MainWindow.h src/main_gui.cpp \
-		src/MainWindow.cpp
+		src/MainWindow.cpp \
+		src/Storage.cpp
 QMAKE_TARGET  = MooDooGUI
 DESTDIR       = 
 TARGET        = MooDooGUI.app/Contents/MacOS/MooDooGUI
@@ -1234,7 +1237,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/homebrew/share/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents src/MainWindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main_gui.cpp src/MainWindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents src/main_gui.cpp src/MainWindow.cpp src/Storage.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1277,10 +1280,14 @@ moc_MainWindow.cpp: src/MainWindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qmainwindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QVBoxLayout \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QHBoxLayout \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QLabel \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qlabel.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QPushButton \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QListWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		src/Storage.h \
 		moc_predefs.h \
 		/opt/homebrew/share/qt/libexec/moc
 	/opt/homebrew/share/qt/libexec/moc $(DEFINES) --include /Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/moc_predefs.h -I/opt/homebrew/share/qt/mkspecs/macx-clang -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/src -I/opt/homebrew/lib/QtWidgets.framework/Headers -I/opt/homebrew/lib/QtGui.framework/Headers -I/opt/homebrew/lib/QtCore.framework/Headers -I/opt/homebrew/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/opt/homebrew/lib src/MainWindow.h -o moc_MainWindow.cpp
@@ -1312,10 +1319,14 @@ main_gui.o: src/main_gui.cpp /opt/homebrew/lib/QtWidgets.framework/Headers/QAppl
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qmainwindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QVBoxLayout \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QHBoxLayout \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QLabel \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qlabel.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QPushButton \
-		/opt/homebrew/lib/QtWidgets.framework/Headers/qpushbutton.h
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QListWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		src/Storage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main_gui.o src/main_gui.cpp
 
 MainWindow.o: src/MainWindow.cpp src/MainWindow.h \
@@ -1323,10 +1334,14 @@ MainWindow.o: src/MainWindow.cpp src/MainWindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qmainwindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QVBoxLayout \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QHBoxLayout \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QLabel \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qlabel.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QPushButton \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QListWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		src/Storage.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QApplication \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qapplication.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QMenuBar \
@@ -1334,8 +1349,13 @@ MainWindow.o: src/MainWindow.cpp src/MainWindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QStatusBar \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qstatusbar.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QMessageBox \
-		/opt/homebrew/lib/QtWidgets.framework/Headers/qmessagebox.h
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qmessagebox.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QGroupBox \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qgroupbox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o src/MainWindow.cpp
+
+Storage.o: src/Storage.cpp src/Storage.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Storage.o src/Storage.cpp
 
 moc_MainWindow.o: moc_MainWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MainWindow.o moc_MainWindow.cpp

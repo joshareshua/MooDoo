@@ -3,8 +3,12 @@
 
 #include <QMainWindow>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QListWidget>
+#include <QPushButton>
+#include "Storage.h"
 
 class MainWindow : public QMainWindow
 {
@@ -18,10 +22,12 @@ private slots:
     void onAddTaskClicked();
     void onAddMoodClicked();
     void onViewTasksClicked();
+    void onRefreshTasksClicked();
 
 private:
     void setupUI();
     void createMenuBar();
+    void refreshTaskList();
     
     // UI elements
     QWidget *centralWidget;
@@ -31,6 +37,13 @@ private:
     QPushButton *addTaskButton;
     QPushButton *addMoodButton;
     QPushButton *viewTasksButton;
+    
+    // Task display
+    QListWidget *taskListWidget;
+    QPushButton *refreshTasksButton;
+    
+    // Storage
+    Storage *storage;
 };
 
 #endif // MAINWINDOW_H 

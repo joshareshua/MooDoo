@@ -6,7 +6,8 @@ TEMPLATE = app
 # Source files
 SOURCES += \
     src/main_gui.cpp \
-    src/MainWindow.cpp
+    src/MainWindow.cpp \
+    src/Storage.cpp
 
 # Header files
 HEADERS += \
