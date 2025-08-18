@@ -23,6 +23,7 @@ private slots:
     void onAddMoodClicked();
     void onViewTasksClicked();
     void onRefreshTasksClicked();
+    void onTaskItemClicked(QListWidgetItem* item);
 
 private:
     void setupUI();
@@ -44,6 +45,10 @@ private:
     
     // Storage
     Storage *storage;
+    
+    // Helper methods
+    void connectTaskSignals();
+    void updateTaskCompletion(int taskId, bool completed);
 };
 
 #endif // MAINWINDOW_H 

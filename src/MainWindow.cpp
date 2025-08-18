@@ -181,7 +181,10 @@ void MainWindow::setupUI()
     connect(addTaskButton, &QPushButton::clicked, this, &MainWindow::onAddTaskClicked);
     connect(addMoodButton, &QPushButton::clicked, this, &MainWindow::onAddMoodClicked);
     connect(viewTasksButton, &QPushButton::clicked, this, &MainWindow::onViewTasksClicked);
-    connect(refreshTasksButton, &QPushButton::clicked, this, &MainWindow::onRefreshTasksClicked);
+    connect(refreshTasksButton, &QPushButton::clicked, this, &MainWindow::onViewTasksClicked);
+    
+    // Connect task list signals
+    connectTaskSignals();
 }
 
 void MainWindow::createMenuBar()
@@ -269,7 +272,10 @@ void MainWindow::refreshTaskList()
                 taskText += " - " + QString::fromStdString(task.description);
             }
             
-            taskListWidget->addItem(taskText);
+            // Create list item and store task ID as data
+            QListWidgetItem* item = new QListWidgetItem(taskText);
+            item->setData(Qt::UserRole, task.id);
+            taskListWidget->addItem(item);
         }
         
         statusBar()->showMessage(QString("Loaded %1 tasks").arg(tasks.size()), 3000);
@@ -277,4 +283,78 @@ void MainWindow::refreshTaskList()
         taskListWidget->addItem("Error loading tasks");
         statusBar()->showMessage("Error loading tasks", 3000);
     }
+}
+
+void MainWindow::connectTaskSignals()
+{
+    // Connect task list item clicks
+    connect(taskListWidget, &QListWidget::itemClicked, this, &MainWindow::onTaskItemClicked);
+}
+
+void MainWindow::onTaskItemClicked(QListWidgetItem* item)
+{
+    if (!item) return;
+    
+    // Get task ID from item data
+    int taskId = item->data(Qt::UserRole).toInt();
+    if (taskId == 0) return; // Skip non-task items
+    
+    // Load current task data
+    std::vector<Task> tasks;
+    if (!storage->loadTasks(tasks)) {
+        statusBar()->showMessage("Error loading tasks", 3000);
+        return;
+    }
+    
+    // Find the clicked task
+    Task* clickedTask = nullptr;
+    for (auto& task : tasks) {
+        if (task.id == taskId) {
+            clickedTask = &task;
+            break;
+        }
+    }
+    
+    if (!clickedTask) {
+        statusBar()->showMessage("Task not found", 3000);
+        return;
+    }
+    
+    // Toggle completion status
+    bool newStatus = !clickedTask->completed;
+    updateTaskCompletion(taskId, newStatus);
+}
+
+void MainWindow::updateTaskCompletion(int taskId, bool completed)
+{
+    // Load current task data
+    std::vector<Task> tasks;
+    if (!storage->loadTasks(tasks)) {
+        statusBar()->showMessage("Error loading tasks", 3000);
+        return;
+    }
+    
+    // Find and update the task
+    for (auto& task : tasks) {
+        if (task.id == taskId) {
+            task.completed = completed;
+            task.completed_time = completed ? time(nullptr) : 0;
+            
+            // Update the task in storage
+            if (storage->updateTask(task)) {
+                statusBar()->showMessage(
+                    completed ? "Task marked as complete! 🎉" : "Task marked as incomplete",
+                    3000
+                );
+                
+                // Refresh the display to show the change
+                refreshTaskList();
+            } else {
+                statusBar()->showMessage("Error updating task", 3000);
+            }
+            return;
+        }
+    }
+    
+    statusBar()->showMessage("Task not found", 3000);
 } 
