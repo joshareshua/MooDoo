@@ -210,7 +210,14 @@ void MainWindow::createMenuBar()
 
 void MainWindow::onAddTaskClicked()
 {
-    QMessageBox::information(this, "Add Task", "Add Task functionality coming soon!");
+    // Create and show the add task dialog
+    AddTaskDialog dialog(storage, this);
+    
+    // If user added a task successfully, refresh the task list
+    if (dialog.exec() == QDialog::Accepted) {
+        refreshTaskList();
+        statusBar()->showMessage("Task added successfully! 🎉", 3000);
+    }
 }
 
 void MainWindow::onAddMoodClicked()

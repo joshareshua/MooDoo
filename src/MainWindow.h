@@ -9,6 +9,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include "Storage.h"
+#include "AddTaskDialog.h"
 
 class MainWindow : public QMainWindow
 {

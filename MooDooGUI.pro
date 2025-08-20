@@ -7,11 +7,13 @@ TEMPLATE = app
 SOURCES += \
     src/main_gui.cpp \
     src/MainWindow.cpp \
-    src/Storage.cpp
+    src/Storage.cpp \
+    src/AddTaskDialog.cpp
 
 # Header files
 HEADERS += \
-    src/MainWindow.h
+    src/MainWindow.h \
+    src/AddTaskDialog.h
 
 # Include directories
 INCLUDEPATH += src/
