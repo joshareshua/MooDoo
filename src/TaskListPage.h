@@ -22,12 +22,8 @@ public slots:
     void onRefreshClicked();
     void refreshTaskList();
 
-private slots:
-    void onTaskItemClicked(QListWidgetItem* item);
-
 private:
     void setupUI();
-    void updateTaskCompletion(int taskId, bool completed);
     
     // UI elements
     QVBoxLayout *mainLayout;

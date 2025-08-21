@@ -94,7 +94,6 @@ void TaskListPage::setupUI()
     // Connect signals
     connect(backButton, &QPushButton::clicked, this, &TaskListPage::onBackClicked);
     connect(refreshButton, &QPushButton::clicked, this, &TaskListPage::onRefreshClicked);
-    connect(taskListWidget, &QListWidget::itemClicked, this, &TaskListPage::onTaskItemClicked);
 }
 
 void TaskListPage::refreshTaskList()
@@ -110,13 +109,6 @@ void TaskListPage::refreshTaskList()
         
         for (const auto& task : tasks) {
             QString taskText;
-            
-            // Add completion status
-            if (task.completed) {
-                taskText += "✅ ";
-            } else {
-                taskText += "○ ";
-            }
             
             // Add priority indicator
             switch(task.priority) {
@@ -140,10 +132,8 @@ void TaskListPage::refreshTaskList()
                 taskText += " - " + QString::fromStdString(task.description);
             }
             
-            // Create list item and store task ID as data
-            QListWidgetItem* item = new QListWidgetItem(taskText);
-            item->setData(Qt::UserRole, task.id);
-            taskListWidget->addItem(item);
+            // Create list item (no need to store task ID for viewing only)
+            taskListWidget->addItem(taskText);
         }
     } else {
         taskListWidget->addItem("Error loading tasks");
@@ -159,60 +149,4 @@ void TaskListPage::onBackClicked()
 void TaskListPage::onRefreshClicked()
 {
     refreshTaskList();
-}
-
-void TaskListPage::onTaskItemClicked(QListWidgetItem* item)
-{
-    if (!item) return;
-    
-    // Get task ID from item data
-    int taskId = item->data(Qt::UserRole).toInt();
-    if (taskId == 0) return; // Skip non-task items
-    
-    // Load current task data
-    std::vector<Task> tasks;
-    if (!storage->loadTasks(tasks)) {
-        return;
-    }
-    
-    // Find the clicked task
-    Task* clickedTask = nullptr;
-    for (auto& task : tasks) {
-        if (task.id == taskId) {
-            clickedTask = &task;
-            break;
-        }
-    }
-    
-    if (!clickedTask) {
-        return;
-    }
-    
-    // Toggle completion status
-    bool newStatus = !clickedTask->completed;
-    updateTaskCompletion(taskId, newStatus);
-}
-
-void TaskListPage::updateTaskCompletion(int taskId, bool completed)
-{
-    // Load current task data
-    std::vector<Task> tasks;
-    if (!storage->loadTasks(tasks)) {
-        return;
-    }
-    
-    // Find and update the task
-    for (auto& task : tasks) {
-        if (task.id == taskId) {
-            task.completed = completed;
-            task.completed_time = completed ? time(nullptr) : 0;
-            
-            // Update the task in storage
-            if (storage->updateTask(task)) {
-                // Refresh the display to show the change
-                refreshTaskList();
-            }
-            return;
-        }
-    }
 } 
