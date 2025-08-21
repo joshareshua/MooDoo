@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include "Storage.h"
 #include "AddTaskDialog.h"
+#include "TaskListPage.h"
 
 class MainWindow : public QMainWindow
 {
@@ -23,13 +24,9 @@ private slots:
     void onAddTaskClicked();
     void onAddMoodClicked();
     void onViewTasksClicked();
-    void onRefreshTasksClicked();
-    void onTaskItemClicked(QListWidgetItem* item);
-
 private:
     void setupUI();
     void createMenuBar();
-    void refreshTaskList();
     
     // UI elements
     QWidget *centralWidget;
@@ -40,16 +37,11 @@ private:
     QPushButton *addMoodButton;
     QPushButton *viewTasksButton;
     
-    // Task display
-    QListWidget *taskListWidget;
-    QPushButton *refreshTasksButton;
-    
     // Storage
     Storage *storage;
     
-    // Helper methods
-    void connectTaskSignals();
-    void updateTaskCompletion(int taskId, bool completed);
+    // Task list page
+    TaskListPage *taskListPage;
 };
 
 #endif // MAINWINDOW_H 

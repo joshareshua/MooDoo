@@ -18,8 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupUI();
     createMenuBar();
     
-    // Load and display initial tasks
-    refreshTaskList();
+    // Task list page will load tasks when needed
     
     // Set status bar
     statusBar()->showMessage("Ready");
@@ -116,63 +115,9 @@ void MainWindow::setupUI()
     // Add some spacing
     mainLayout->addSpacing(20);
     
-    // Create task display section
-    QGroupBox *taskGroup = new QGroupBox("Current Tasks", this);
-    taskGroup->setStyleSheet(
-        "QGroupBox { "
-        "   font-weight: bold; "
-        "   font-size: 14px; "
-        "   border: 2px solid #ddd; "
-        "   border-radius: 8px; "
-        "   margin-top: 10px; "
-        "   padding-top: 10px; "
-        "} "
-        "QGroupBox::title { "
-        "   subcontrol-origin: margin; "
-        "   left: 10px; "
-        "   padding: 0 5px 0 5px; "
-        "   color: #4A90E2; "
-        "}"
-    );
-    
-    QVBoxLayout *taskLayout = new QVBoxLayout(taskGroup);
-    
-    // Add refresh button
-    refreshTasksButton = new QPushButton("🔄 Refresh Tasks", this);
-    refreshTasksButton->setStyleSheet(
-        "QPushButton { "
-        "   background-color: #9C27B0; "
-        "   color: white; "
-        "   border: none; "
-        "   padding: 8px; "
-        "   font-size: 12px; "
-        "   border-radius: 6px; "
-        "   max-width: 120px; "
-        "} "
-        "QPushButton:hover { "
-        "   background-color: #7B1FA2; "
-        "}"
-    );
-    
-    QHBoxLayout *refreshLayout = new QHBoxLayout();
-    refreshLayout->addWidget(refreshTasksButton);
-    refreshLayout->addStretch();
-    taskLayout->addLayout(refreshLayout);
-    
-    // Add task list widget
-    taskListWidget = new QListWidget(this);
-    taskListWidget->setStyleSheet(
-        "QListWidget { "
-        "   border: 1px solid #ccc; "
-        "   border-radius: 4px; "
-        "   padding: 5px; "
-        "   background-color: #fafafa; "
-        "   min-height: 200px; "
-        "}"
-    );
-    taskLayout->addWidget(taskListWidget);
-    
-    mainLayout->addWidget(taskGroup);
+    // Create task list page (hidden initially)
+    taskListPage = new TaskListPage(storage, this);
+    taskListPage->hide();
     
     // Add some spacing at the bottom
     mainLayout->addStretch();
@@ -181,10 +126,6 @@ void MainWindow::setupUI()
     connect(addTaskButton, &QPushButton::clicked, this, &MainWindow::onAddTaskClicked);
     connect(addMoodButton, &QPushButton::clicked, this, &MainWindow::onAddMoodClicked);
     connect(viewTasksButton, &QPushButton::clicked, this, &MainWindow::onViewTasksClicked);
-    connect(refreshTasksButton, &QPushButton::clicked, this, &MainWindow::onViewTasksClicked);
-    
-    // Connect task list signals
-    connectTaskSignals();
 }
 
 void MainWindow::createMenuBar()
@@ -213,9 +154,8 @@ void MainWindow::onAddTaskClicked()
     // Create and show the add task dialog
     AddTaskDialog dialog(storage, this);
     
-    // If user added a task successfully, refresh the task list
+    // If user added a task successfully, show success message
     if (dialog.exec() == QDialog::Accepted) {
-        refreshTaskList();
         statusBar()->showMessage("Task added successfully! 🎉", 3000);
     }
 }
@@ -227,141 +167,8 @@ void MainWindow::onAddMoodClicked()
 
 void MainWindow::onViewTasksClicked()
 {
-    QMessageBox::information(this, "View Tasks", "Task viewing functionality coming soon!");
-}
-
-void MainWindow::onRefreshTasksClicked()
-{
-    refreshTaskList();
-    statusBar()->showMessage("Tasks refreshed!", 2000);
-}
-
-void MainWindow::refreshTaskList()
-{
-    taskListWidget->clear();
-    
-    std::vector<Task> tasks;
-    if (storage->loadTasks(tasks)) {
-        if (tasks.empty()) {
-            taskListWidget->addItem("No tasks found. Add some tasks to get started!");
-            return;
-        }
-        
-        for (const auto& task : tasks) {
-            QString taskText;
-            
-            // Add completion status
-            if (task.completed) {
-                taskText += "✅ ";
-            } else {
-                taskText += "○ ";
-            }
-            
-            // Add priority indicator
-            switch(task.priority) {
-                case Priority::LOW: taskText += "🟢 "; break;
-                case Priority::HIGH: taskText += "🔴 "; break;
-                default: taskText += "🟡 "; break;
-            }
-            
-            // Add difficulty indicator
-            switch(task.difficulty) {
-                case TaskDifficulty::EASY: taskText += "📚 "; break;
-                case TaskDifficulty::HARD: taskText += "💪 "; break;
-                default: taskText += "📝 "; break;
-            }
-            
-            // Add task title
-            taskText += QString::fromStdString(task.title);
-            
-            // Add description if available
-            if (!task.description.empty()) {
-                taskText += " - " + QString::fromStdString(task.description);
-            }
-            
-            // Create list item and store task ID as data
-            QListWidgetItem* item = new QListWidgetItem(taskText);
-            item->setData(Qt::UserRole, task.id);
-            taskListWidget->addItem(item);
-        }
-        
-        statusBar()->showMessage(QString("Loaded %1 tasks").arg(tasks.size()), 3000);
-    } else {
-        taskListWidget->addItem("Error loading tasks");
-        statusBar()->showMessage("Error loading tasks", 3000);
-    }
-}
-
-void MainWindow::connectTaskSignals()
-{
-    // Connect task list item clicks
-    connect(taskListWidget, &QListWidget::itemClicked, this, &MainWindow::onTaskItemClicked);
-}
-
-void MainWindow::onTaskItemClicked(QListWidgetItem* item)
-{
-    if (!item) return;
-    
-    // Get task ID from item data
-    int taskId = item->data(Qt::UserRole).toInt();
-    if (taskId == 0) return; // Skip non-task items
-    
-    // Load current task data
-    std::vector<Task> tasks;
-    if (!storage->loadTasks(tasks)) {
-        statusBar()->showMessage("Error loading tasks", 3000);
-        return;
-    }
-    
-    // Find the clicked task
-    Task* clickedTask = nullptr;
-    for (auto& task : tasks) {
-        if (task.id == taskId) {
-            clickedTask = &task;
-            break;
-        }
-    }
-    
-    if (!clickedTask) {
-        statusBar()->showMessage("Task not found", 3000);
-        return;
-    }
-    
-    // Toggle completion status
-    bool newStatus = !clickedTask->completed;
-    updateTaskCompletion(taskId, newStatus);
-}
-
-void MainWindow::updateTaskCompletion(int taskId, bool completed)
-{
-    // Load current task data
-    std::vector<Task> tasks;
-    if (!storage->loadTasks(tasks)) {
-        statusBar()->showMessage("Error loading tasks", 3000);
-        return;
-    }
-    
-    // Find and update the task
-    for (auto& task : tasks) {
-        if (task.id == taskId) {
-            task.completed = completed;
-            task.completed_time = completed ? time(nullptr) : 0;
-            
-            // Update the task in storage
-            if (storage->updateTask(task)) {
-                statusBar()->showMessage(
-                    completed ? "Task marked as complete! 🎉" : "Task marked as incomplete",
-                    3000
-                );
-                
-                // Refresh the display to show the change
-                refreshTaskList();
-            } else {
-                statusBar()->showMessage("Error updating task", 3000);
-            }
-            return;
-        }
-    }
-    
-    statusBar()->showMessage("Task not found", 3000);
+    // Show task list page as a separate window
+    taskListPage->show();
+    taskListPage->raise();
+    taskListPage->refreshTaskList();
 } 

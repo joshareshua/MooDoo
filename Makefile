@@ -55,14 +55,18 @@ OBJECTS_DIR   = ./
 SOURCES       = src/main_gui.cpp \
 		src/MainWindow.cpp \
 		src/Storage.cpp \
-		src/AddTaskDialog.cpp moc_MainWindow.cpp \
-		moc_AddTaskDialog.cpp
+		src/AddTaskDialog.cpp \
+		src/TaskListPage.cpp moc_MainWindow.cpp \
+		moc_AddTaskDialog.cpp \
+		moc_TaskListPage.cpp
 OBJECTS       = main_gui.o \
 		MainWindow.o \
 		Storage.o \
 		AddTaskDialog.o \
+		TaskListPage.o \
 		moc_MainWindow.o \
-		moc_AddTaskDialog.o
+		moc_AddTaskDialog.o \
+		moc_TaskListPage.o
 DIST          = /opt/homebrew/share/qt/mkspecs/features/spec_pre.prf \
 		/opt/homebrew/share/qt/mkspecs/features/device_config.prf \
 		/opt/homebrew/Cellar/qt/6.9.1/share/qt/mkspecs/common/unix.conf \
@@ -436,10 +440,12 @@ DIST          = /opt/homebrew/share/qt/mkspecs/features/spec_pre.prf \
 		/opt/homebrew/share/qt/mkspecs/features/yacc.prf \
 		/opt/homebrew/share/qt/mkspecs/features/lex.prf \
 		MooDooGUI.pro src/MainWindow.h \
-		src/AddTaskDialog.h src/main_gui.cpp \
+		src/AddTaskDialog.h \
+		src/TaskListPage.h src/main_gui.cpp \
 		src/MainWindow.cpp \
 		src/Storage.cpp \
-		src/AddTaskDialog.cpp
+		src/AddTaskDialog.cpp \
+		src/TaskListPage.cpp
 QMAKE_TARGET  = MooDooGUI
 DESTDIR       = 
 TARGET        = MooDooGUI.app/Contents/MacOS/MooDooGUI
@@ -1242,8 +1248,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/homebrew/share/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents src/MainWindow.h src/AddTaskDialog.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main_gui.cpp src/MainWindow.cpp src/Storage.cpp src/AddTaskDialog.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents src/MainWindow.h src/AddTaskDialog.h src/TaskListPage.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main_gui.cpp src/MainWindow.cpp src/Storage.cpp src/AddTaskDialog.cpp src/TaskListPage.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1278,9 +1284,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /opt/homebrew/share/qt/mkspecs/features/data/dummy.cpp
 	/Library/Developer/CommandLineTools/usr/bin/clang++ -pipe -stdlib=libc++ -O2 -std=gnu++1z $(EXPORT_ARCH_ARGS) -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mmacosx-version-min=14.0 -Wall -Wextra -dM -E -o moc_predefs.h /opt/homebrew/share/qt/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_MainWindow.cpp moc_AddTaskDialog.cpp
+compiler_moc_header_make_all: moc_MainWindow.cpp moc_AddTaskDialog.cpp moc_TaskListPage.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_MainWindow.cpp moc_AddTaskDialog.cpp
+	-$(DEL_FILE) moc_MainWindow.cpp moc_AddTaskDialog.cpp moc_TaskListPage.cpp
 moc_MainWindow.cpp: src/MainWindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QMainWindow \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qmainwindow.h \
@@ -1303,6 +1309,9 @@ moc_MainWindow.cpp: src/MainWindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qcombobox.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QTextEdit \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qtextedit.h \
+		src/TaskListPage.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qwidget.h \
 		moc_predefs.h \
 		/opt/homebrew/share/qt/libexec/moc
 	/opt/homebrew/share/qt/libexec/moc $(DEFINES) --include /Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/moc_predefs.h -I/opt/homebrew/share/qt/mkspecs/macx-clang -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/src -I/opt/homebrew/lib/QtWidgets.framework/Headers -I/opt/homebrew/lib/QtGui.framework/Headers -I/opt/homebrew/lib/QtCore.framework/Headers -I/opt/homebrew/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/opt/homebrew/lib src/MainWindow.h -o moc_MainWindow.cpp
@@ -1327,6 +1336,23 @@ moc_AddTaskDialog.cpp: src/AddTaskDialog.h \
 		moc_predefs.h \
 		/opt/homebrew/share/qt/libexec/moc
 	/opt/homebrew/share/qt/libexec/moc $(DEFINES) --include /Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/moc_predefs.h -I/opt/homebrew/share/qt/mkspecs/macx-clang -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/src -I/opt/homebrew/lib/QtWidgets.framework/Headers -I/opt/homebrew/lib/QtGui.framework/Headers -I/opt/homebrew/lib/QtCore.framework/Headers -I/opt/homebrew/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/opt/homebrew/lib src/AddTaskDialog.h -o moc_AddTaskDialog.cpp
+
+moc_TaskListPage.cpp: src/TaskListPage.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qwidget.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QVBoxLayout \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QHBoxLayout \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QLabel \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qlabel.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QPushButton \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QListWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		src/Storage.h \
+		moc_predefs.h \
+		/opt/homebrew/share/qt/libexec/moc
+	/opt/homebrew/share/qt/libexec/moc $(DEFINES) --include /Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/moc_predefs.h -I/opt/homebrew/share/qt/mkspecs/macx-clang -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo -I/Users/joshareshua/Documents/Personal_Projects/MooDoo2/MooDoo/src -I/opt/homebrew/lib/QtWidgets.framework/Headers -I/opt/homebrew/lib/QtGui.framework/Headers -I/opt/homebrew/lib/QtCore.framework/Headers -I/opt/homebrew/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/opt/homebrew/lib src/TaskListPage.h -o moc_TaskListPage.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1371,7 +1397,10 @@ main_gui.o: src/main_gui.cpp /opt/homebrew/lib/QtWidgets.framework/Headers/QAppl
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QComboBox \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qcombobox.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QTextEdit \
-		/opt/homebrew/lib/QtWidgets.framework/Headers/qtextedit.h
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qtextedit.h \
+		src/TaskListPage.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qwidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main_gui.o src/main_gui.cpp
 
 MainWindow.o: src/MainWindow.cpp src/MainWindow.h \
@@ -1396,6 +1425,9 @@ MainWindow.o: src/MainWindow.cpp src/MainWindow.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qcombobox.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QTextEdit \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qtextedit.h \
+		src/TaskListPage.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qwidget.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QApplication \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qapplication.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/QMenuBar \
@@ -1432,11 +1464,31 @@ AddTaskDialog.o: src/AddTaskDialog.cpp src/AddTaskDialog.h \
 		/opt/homebrew/lib/QtWidgets.framework/Headers/qmessagebox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AddTaskDialog.o src/AddTaskDialog.cpp
 
+TaskListPage.o: src/TaskListPage.cpp src/TaskListPage.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qwidget.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QVBoxLayout \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QHBoxLayout \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QLabel \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qlabel.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QPushButton \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QListWidget \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		src/Storage.h \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/QMessageBox \
+		/opt/homebrew/lib/QtWidgets.framework/Headers/qmessagebox.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TaskListPage.o src/TaskListPage.cpp
+
 moc_MainWindow.o: moc_MainWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MainWindow.o moc_MainWindow.cpp
 
 moc_AddTaskDialog.o: moc_AddTaskDialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_AddTaskDialog.o moc_AddTaskDialog.cpp
+
+moc_TaskListPage.o: moc_TaskListPage.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TaskListPage.o moc_TaskListPage.cpp
 
 ####### Install
 
