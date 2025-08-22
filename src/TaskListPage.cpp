@@ -42,8 +42,18 @@ void TaskListPage::setupUI()
         "   border-radius: 8px; "
         "   padding: 10px; "
         "   background-color: #fafafa; "
+        "   color: #333; "
         "   font-size: 14px; "
         "   min-height: 400px; "
+        "}"
+        "QListWidget::item { "
+        "   color: #333; "
+        "   padding: 8px; "
+        "   border-bottom: 1px solid #eee; "
+        "}"
+        "QListWidget::item:selected { "
+        "   background-color: #e3f2fd; "
+        "   color: #1976d2; "
         "}"
     );
     mainLayout->addWidget(taskListWidget);
