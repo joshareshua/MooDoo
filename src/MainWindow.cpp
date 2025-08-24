@@ -162,7 +162,13 @@ void MainWindow::onAddTaskClicked()
 
 void MainWindow::onAddMoodClicked()
 {
-    QMessageBox::information(this, "Log Mood", "Mood logging functionality coming soon!");
+    // Create and show the mood entry dialog
+    MoodEntryDialog dialog(storage, this);
+    
+    // If user added a mood entry successfully, show success message
+    if (dialog.exec() == QDialog::Accepted) {
+        statusBar()->showMessage("Mood entry logged successfully! 💚", 3000);
+    }
 }
 
 void MainWindow::onViewTasksClicked()

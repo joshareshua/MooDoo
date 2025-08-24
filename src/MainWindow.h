@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include "Storage.h"
 #include "AddTaskDialog.h"
+#include "MoodEntryDialog.h"
 #include "TaskListPage.h"
 
 class MainWindow : public QMainWindow
