@@ -92,6 +92,27 @@ void MainWindow::setupUI()
     );
     mainLayout->addWidget(addMoodButton);
     
+    // Add mood history button
+    QPushButton *viewMoodHistoryButton = new QPushButton("📊 View Mood History", this);
+    viewMoodHistoryButton->setStyleSheet(
+        "QPushButton { "
+        "   background-color: #4CAF50; "
+        "   color: white; "
+        "   border: none; "
+        "   padding: 15px; "
+        "   font-size: 16px; "
+        "   border-radius: 8px; "
+        "   min-height: 50px; "
+        "} "
+        "QPushButton:hover { "
+        "   background-color: #45a049; "
+        "} "
+        "QPushButton:pressed { "
+        "   background-color: #3d8b40; "
+        "}"
+    );
+    mainLayout->addWidget(viewMoodHistoryButton);
+    
     viewTasksButton = new QPushButton("📋 View All Tasks", this);
     viewTasksButton->setStyleSheet(
         "QPushButton { "
@@ -115,9 +136,11 @@ void MainWindow::setupUI()
     // Add some spacing
     mainLayout->addSpacing(20);
     
-    // Create task list page (hidden initially)
+    // Create pages (hidden initially)
     taskListPage = new TaskListPage(storage, this);
     taskListPage->hide();
+    moodHistoryPage = new MoodHistoryPage(storage, this);
+    moodHistoryPage->hide();
     
     // Add some spacing at the bottom
     mainLayout->addStretch();
@@ -125,6 +148,7 @@ void MainWindow::setupUI()
     // Connect button signals
     connect(addTaskButton, &QPushButton::clicked, this, &MainWindow::onAddTaskClicked);
     connect(addMoodButton, &QPushButton::clicked, this, &MainWindow::onAddMoodClicked);
+    connect(viewMoodHistoryButton, &QPushButton::clicked, this, &MainWindow::onViewMoodHistoryClicked);
     connect(viewTasksButton, &QPushButton::clicked, this, &MainWindow::onViewTasksClicked);
 }
 
@@ -177,4 +201,12 @@ void MainWindow::onViewTasksClicked()
     taskListPage->show();
     taskListPage->raise();
     taskListPage->refreshTaskList();
+}
+
+void MainWindow::onViewMoodHistoryClicked()
+{
+    // Show mood history page as a separate window
+    moodHistoryPage->show();
+    moodHistoryPage->raise();
+    moodHistoryPage->refreshMoodList();
 } 

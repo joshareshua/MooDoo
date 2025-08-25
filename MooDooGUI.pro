@@ -10,6 +10,7 @@ SOURCES += \
     src/Storage.cpp \
     src/AddTaskDialog.cpp \
     src/MoodEntryDialog.cpp \
+    src/MoodHistoryPage.cpp \
     src/TaskListPage.cpp
 
 # Header files
@@ -17,6 +18,7 @@ HEADERS += \
     src/MainWindow.h \
     src/AddTaskDialog.h \
     src/MoodEntryDialog.h \
+    src/MoodHistoryPage.h \
     src/TaskListPage.h
 
 # Include directories

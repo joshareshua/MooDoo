@@ -11,6 +11,7 @@
 #include "Storage.h"
 #include "AddTaskDialog.h"
 #include "MoodEntryDialog.h"
+#include "MoodHistoryPage.h"
 #include "TaskListPage.h"
 
 class MainWindow : public QMainWindow
@@ -24,6 +25,7 @@ public:
 private slots:
     void onAddTaskClicked();
     void onAddMoodClicked();
+    void onViewMoodHistoryClicked();
     void onViewTasksClicked();
 private:
     void setupUI();
@@ -41,8 +43,9 @@ private:
     // Storage
     Storage *storage;
     
-    // Task list page
+    // Pages
     TaskListPage *taskListPage;
+    MoodHistoryPage *moodHistoryPage;
 };
 
 #endif // MAINWINDOW_H 

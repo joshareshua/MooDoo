@@ -1,8 +1,8 @@
-1|Complete project proposal|Create first draft for new feature|3|2|0|0|0
+1|Complete project proposal|Create first draft for new feature|3|2|1|0|0
 1|Complete project proposal|Write the initial draft for the new feature|3|2|0|0|0
 2|Buy groceries|Milk, bread, eggs, and vegetables|1|2|0|0|0
 1|Complete project proposal|Write the initial draft for the new feature|3|2|0|0|0
 2|Buy groceries|Milk, bread, eggs, and vegetables|1|2|0|0|0
 1|Study for Interview|Technical SWE interview|3|3|0|1754878695|0
-3|Basketball Practice|Go to practice|3|3|0|1755655806|0
-4|Chess Club Event|Chess tournament|2|2|1|1755742562|1755811319
+3|Basketball Practice|Go to practice|3|3|1|1755655806|0
+4|Chess Club Event|Chess tournament|2|2|0|1755742562|1755811319
