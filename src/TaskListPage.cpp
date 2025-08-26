@@ -34,6 +34,32 @@ void TaskListPage::setupUI()
     titleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(titleLabel);
     
+    // Priority filter
+    QHBoxLayout *filterLayout = new QHBoxLayout();
+    QLabel *filterLabel = new QLabel("Filter by Priority:", this);
+    filterLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #333;");
+    filterLayout->addWidget(filterLabel);
+    
+    QComboBox *priorityFilter = new QComboBox(this);
+    priorityFilter->setObjectName("priorityFilter");
+    priorityFilter->addItem("All Priorities", -1);
+    priorityFilter->addItem("🟢 Low Priority", static_cast<int>(Priority::LOW));
+    priorityFilter->addItem("🟡 Medium Priority", static_cast<int>(Priority::MEDIUM));
+    priorityFilter->addItem("🔴 High Priority", static_cast<int>(Priority::HIGH));
+    priorityFilter->setStyleSheet(
+        "QComboBox { "
+        "   padding: 8px; "
+        "   border: 2px solid #ddd; "
+        "   border-radius: 6px; "
+        "   font-size: 14px; "
+        "   background-color: white; "
+        "   min-width: 150px; "
+        "}"
+    );
+    filterLayout->addWidget(priorityFilter);
+    filterLayout->addStretch();
+    mainLayout->addLayout(filterLayout);
+    
     // Task list
     taskListWidget = new QListWidget(this);
     taskListWidget->setStyleSheet(
@@ -44,7 +70,7 @@ void TaskListPage::setupUI()
         "   background-color: #fafafa; "
         "   color: #333; "
         "   font-size: 14px; "
-        "   min-height: 400px; "
+        "   min-height: 350px; "
         "}"
         "QListWidget::item { "
         "   color: #333; "
@@ -104,6 +130,13 @@ void TaskListPage::setupUI()
     // Connect signals
     connect(backButton, &QPushButton::clicked, this, &TaskListPage::onBackClicked);
     connect(refreshButton, &QPushButton::clicked, this, &TaskListPage::onRefreshClicked);
+    
+    // Connect priority filter
+    QComboBox *filterCombo = findChild<QComboBox*>("priorityFilter");
+    if (filterCombo) {
+        connect(filterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), 
+                this, &TaskListPage::onPriorityFilterChanged);
+    }
 }
 
 void TaskListPage::refreshTaskList()
@@ -159,4 +192,71 @@ void TaskListPage::onBackClicked()
 void TaskListPage::onRefreshClicked()
 {
     refreshTaskList();
+}
+
+void TaskListPage::onPriorityFilterChanged(int index)
+{
+    // Get the selected priority value
+    QComboBox *priorityFilter = findChild<QComboBox*>("priorityFilter");
+    if (!priorityFilter) return;
+    
+    int priorityValue = priorityFilter->itemData(index).toInt();
+    
+    // Clear and reload tasks with filter
+    taskListWidget->clear();
+    
+    std::vector<Task> tasks;
+    if (storage->loadTasks(tasks)) {
+        if (tasks.empty()) {
+            taskListWidget->addItem("No tasks found. Add some tasks to get started!");
+            return;
+        }
+        
+        for (const auto& task : tasks) {
+            // Apply priority filter
+            if (priorityValue != -1 && static_cast<int>(task.priority) != priorityValue) {
+                continue;
+            }
+            
+            QString taskText;
+            
+            // Add priority indicator
+            switch(task.priority) {
+                case Priority::LOW: taskText += "🟢 "; break;
+                case Priority::HIGH: taskText += "🔴 "; break;
+                default: taskText += "🟡 "; break;
+            }
+            
+            // Add difficulty indicator
+            switch(task.difficulty) {
+                case TaskDifficulty::EASY: taskText += "📚 "; break;
+                case TaskDifficulty::HARD: taskText += "💪 "; break;
+                default: taskText += "📝 "; break;
+            }
+            
+            // Add task title
+            taskText += QString::fromStdString(task.title);
+            
+            // Add description if available
+            if (!task.description.empty()) {
+                taskText += " - " + QString::fromStdString(task.description);
+            }
+            
+            taskListWidget->addItem(taskText);
+        }
+        
+        // Show filter status
+        if (priorityValue != -1) {
+            QString filterText;
+            
+            switch(priorityValue) {
+                case static_cast<int>(Priority::LOW): filterText = "🟢 Low Priority"; break;
+                case static_cast<int>(Priority::MEDIUM): filterText = "🟡 Medium Priority"; break;
+                case static_cast<int>(Priority::HIGH): filterText = "🔴 High Priority"; break;
+            }
+            taskListWidget->addItem("--- Showing " + filterText + " tasks ---");
+        }
+    } else {
+        taskListWidget->addItem("Error loading tasks");
+    }
 } 
