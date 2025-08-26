@@ -30,6 +30,7 @@ private slots:
 private:
     void setupUI();
     void createMenuBar();
+    void updateStatistics();
     
     // UI elements
     QWidget *centralWidget;
