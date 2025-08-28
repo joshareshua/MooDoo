@@ -34,6 +34,29 @@ void TaskListPage::setupUI()
     titleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(titleLabel);
     
+    // Search box
+    QHBoxLayout *searchLayout = new QHBoxLayout();
+    QLabel *searchLabel = new QLabel("🔍 Search Tasks:", this);
+    searchLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #333;");
+    searchLayout->addWidget(searchLabel);
+    
+    QLineEdit *searchBox = new QLineEdit(this);
+    searchBox->setObjectName("searchBox");
+    searchBox->setPlaceholderText("Type to search tasks...");
+    searchBox->setStyleSheet(
+        "QLineEdit { "
+        "   padding: 8px; "
+        "   border: 2px solid #ddd; "
+        "   border-radius: 6px; "
+        "   font-size: 14px; "
+        "   background-color: white; "
+        "   min-width: 200px; "
+        "}"
+    );
+    searchLayout->addWidget(searchBox);
+    searchLayout->addStretch();
+    mainLayout->addLayout(searchLayout);
+    
     // Priority filter
     QHBoxLayout *filterLayout = new QHBoxLayout();
     QLabel *filterLabel = new QLabel("Filter by Priority:", this);
@@ -48,7 +71,6 @@ void TaskListPage::setupUI()
     priorityFilter->addItem("🔴 High Priority", static_cast<int>(Priority::HIGH));
     priorityFilter->setStyleSheet(
         "QComboBox { "
-        "   padding: 8px; "
         "   border: 2px solid #ddd; "
         "   border-radius: 6px; "
         "   font-size: 14px; "
@@ -136,6 +158,13 @@ void TaskListPage::setupUI()
     if (filterCombo) {
         connect(filterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), 
                 this, &TaskListPage::onPriorityFilterChanged);
+    }
+    
+    // Connect search box
+    QLineEdit *searchInput = findChild<QLineEdit*>("searchBox");
+    if (searchInput) {
+        connect(searchInput, &QLineEdit::textChanged, 
+                this, &TaskListPage::onSearchTextChanged);
     }
 }
 
@@ -255,6 +284,94 @@ void TaskListPage::onPriorityFilterChanged(int index)
                 case static_cast<int>(Priority::HIGH): filterText = "🔴 High Priority"; break;
             }
             taskListWidget->addItem("--- Showing " + filterText + " tasks ---");
+        }
+    } else {
+        taskListWidget->addItem("Error loading tasks");
+    }
+} 
+
+void TaskListPage::onSearchTextChanged(const QString& searchText)
+{
+    // Get current priority filter
+    QComboBox *priorityFilter = findChild<QComboBox*>("priorityFilter");
+    int priorityValue = -1;
+    if (priorityFilter) {
+        priorityValue = priorityFilter->itemData(priorityFilter->currentIndex()).toInt();
+    }
+    
+    // Clear and reload tasks with search and priority filter
+    taskListWidget->clear();
+    
+    std::vector<Task> tasks;
+    if (storage->loadTasks(tasks)) {
+        if (tasks.empty()) {
+            taskListWidget->addItem("No tasks found. Add some tasks to get started!");
+            return;
+        }
+        
+        int foundCount = 0;
+        for (const auto& task : tasks) {
+            // Apply priority filter
+            if (priorityValue != -1 && static_cast<int>(task.priority) != priorityValue) {
+                continue;
+            }
+            
+            // Apply search filter
+            QString taskTitle = QString::fromStdString(task.title);
+            QString taskDesc = QString::fromStdString(task.description);
+            if (!searchText.isEmpty() && 
+                !taskTitle.contains(searchText, Qt::CaseInsensitive) && 
+                !taskDesc.contains(searchText, Qt::CaseInsensitive)) {
+                continue;
+            }
+            
+            QString taskText;
+            
+            // Add priority indicator
+            switch(task.priority) {
+                case Priority::LOW: taskText += "🟢 "; break;
+                case Priority::HIGH: taskText += "🔴 "; break;
+                default: taskText += "🟡 "; break;
+            }
+            
+            // Add difficulty indicator
+            switch(task.difficulty) {
+                case TaskDifficulty::EASY: taskText += "📚 "; break;
+                case TaskDifficulty::HARD: taskText += "💪 "; break;
+                default: taskText += "📝 "; break;
+            }
+            
+            // Add task title
+            taskText += taskTitle;
+            
+            // Add description if available
+            if (!task.description.empty()) {
+                taskText += " - " + taskDesc;
+            }
+            
+            taskListWidget->addItem(taskText);
+            foundCount++;
+        }
+        
+        // Show search and filter status
+        QString statusText = "--- ";
+        if (!searchText.isEmpty()) {
+            statusText += QString("Search: '%1' - ").arg(searchText);
+        }
+        if (priorityValue != -1) {
+            QString filterText;
+            switch(priorityValue) {
+                case static_cast<int>(Priority::LOW): filterText = "🟢 Low Priority"; break;
+                case static_cast<int>(Priority::MEDIUM): filterText = "🟡 Medium Priority"; break;
+                case static_cast<int>(Priority::HIGH): filterText = "🔴 High Priority"; break;
+            }
+            statusText += QString("Filter: %1 - ").arg(filterText);
+        }
+        statusText += QString("Found %1 tasks ---").arg(foundCount);
+        taskListWidget->addItem(statusText);
+        
+        if (foundCount == 0) {
+            taskListWidget->addItem("No tasks match your search and filter criteria.");
         }
     } else {
         taskListWidget->addItem("Error loading tasks");

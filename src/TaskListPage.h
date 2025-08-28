@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QListWidget>
 #include <QComboBox>
+#include <QLineEdit>
 #include "Storage.h"
 
 class TaskListPage : public QWidget
@@ -23,6 +24,7 @@ public slots:
     void onRefreshClicked();
     void refreshTaskList();
     void onPriorityFilterChanged(int index);
+    void onSearchTextChanged(const QString& text);
 
 private:
     void setupUI();
